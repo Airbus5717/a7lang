@@ -29,9 +29,10 @@ class Lexer
         }
 
         if (s == Status.Failure)
+        {
             RestoreState();
-        Utils.TODO("implement Error message in lexer");
-
+            Utils.TODO("implement Error message in lexer");
+        }
         return s;
     }
 

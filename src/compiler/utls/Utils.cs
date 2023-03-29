@@ -54,7 +54,7 @@ public class Utils
 
             // NOTE: Very important check
             // due to some casts later on
-            if (s.Length >= (int.MaxValue >> 1))
+            if (s.Length >= (int.MaxValue >> 2))
             {
                 LogErr("Too Large file: " + path);
                 return null;

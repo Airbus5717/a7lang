@@ -3,8 +3,6 @@ class Program
 {
     static void Main(string[] args)
     {
-        var opts = new CompileOptions();
-        opts.path = "main.vr";
-        Compiler.compile(opts);
+        Compiler.compile(new CompileOptions("main.vr"));
     }
 }

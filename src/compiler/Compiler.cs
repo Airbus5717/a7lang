@@ -3,8 +3,8 @@
 struct CompileOptions
 {
     public string path { get; set; } = "";
-
-    public CompileOptions() { }
+    // TODO: more options
+    public CompileOptions(string path) { this.path = path; }
 }
 
 class Compiler
