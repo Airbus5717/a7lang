@@ -173,7 +173,7 @@ class Lexer
                             Advance();
                         return Status.Success;
                     }
-                    // TODO: Multiline comments
+                    // TODO: Implement Multiline comments
                     // '/'
                     return AddToken(TknType.Div);
                 }
@@ -209,8 +209,8 @@ class Lexer
         {
             switch (p)
             {
-                case 'x': return LexHexInt();
-                case 'b': return LexBinaryInt();
+                case 'x': return LexHexIntLiteral();
+                case 'b': return LexBinaryIntLiteral();
                 default: break;
             }
         }
@@ -235,13 +235,13 @@ class Lexer
         return AddToken(reached_dot ? TknType.FloatLiteral : TknType.IntegerLiteral);
     }
 
-    Status LexHexInt()
+    Status LexHexIntLiteral()
     {
         Utils.TODO("Lex Hexadecimal integer literals");
         return Status.Failure;
     }
 
-    Status LexBinaryInt()
+    Status LexBinaryIntLiteral()
     {
         Utils.TODO("Lex binary integer literals");
         return Status.Failure;

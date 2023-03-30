@@ -24,7 +24,7 @@ class Compiler
 
         // STAGE: Read File
         var myFile = Utils.ReadFile(opts.path);
-        if (myFile == null)
+        if (myFile.m_res == Res.Err)
             return Status.Failure;
 
 

@@ -1,4 +1,3 @@
-
 using System.Runtime.CompilerServices;
 
 public enum Status : byte
@@ -8,6 +7,23 @@ public enum Status : byte
     Done,
 }
 
+public enum Res
+{
+    Ok,
+    Err,
+}
+
+public class Result<T>
+{
+    public T m_item;
+    public Res m_res;
+
+    public Result(T item, Res res = Res.Ok)
+    {
+        m_item = item;
+        m_res = res;
+    }
+}
 
 public class Utils
 {
@@ -44,8 +60,7 @@ public class Utils
         Console.WriteLine(s);
     }
 
-
-    public static string? ReadFile(string path)
+    public static Result<string> ReadFile(string path)
     {
         if (Path.Exists(path))
         {
@@ -64,11 +79,11 @@ public class Utils
             var padding = new char[10];
             Array.Fill(padding, char.MinValue);
 
-            return s + padding;
+            return new Result<string>(s + padding);
         }
 
         LogErr("File [" + path + "] not found");
-        return null;
+        return new Result<string>("", Res.Err);
     }
 
     public static void Exit(int x)
