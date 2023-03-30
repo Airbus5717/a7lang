@@ -1,19 +1,18 @@
 
 class Lexer
 {
-    List<Token> tokens;
-    uint index, length, line;
+    List<Token> m_tokens;
+    uint m_index, m_length, m_line;
+    readonly string m_file;
 
+    // save state variables
     uint save_index, save_length, save_line;
-
-    readonly string file;
-
 
     Lexer(ref string file)
     {
-        this.file = file;
-        this.tokens = new List<Token>();
-        this.line = 1;
+        this.m_file = file;
+        this.m_tokens = new List<Token>();
+        this.m_line = 1;
     }
 
     // NOTE(5717): Lexer starting point
@@ -40,7 +39,7 @@ class Lexer
     {
         char c = CurrentChar(), p = PeekChar();
 
-        length = 1; // reset length
+        m_length = 1; // reset length
 
         SkipWhitespace();
 
@@ -75,7 +74,7 @@ class Lexer
                     if (p == '.')
                     {
                         // '..'
-                        length++;
+                        m_length++;
                         return AddToken(TknType.To);
                     }
                     // '.'
@@ -86,13 +85,13 @@ class Lexer
                     if (p == '=')
                     {
                         // '>='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.GreaterEql);
                     }
                     else if (p == '>')
                     {
                         // '>>'
-                        length++;
+                        m_length++;
                         return AddToken(TknType.RightShift);
                     }
                     // '>'
@@ -103,13 +102,13 @@ class Lexer
                     if (p == '=')
                     {
                         // '<='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.LessEql);
                     }
                     else if (p == '<')
                     {
                         // '<<'
-                        length++;
+                        m_length++;
                         return AddToken(TknType.LeftShift);
                     }
                     // '<'
@@ -120,7 +119,7 @@ class Lexer
                     if (p == '=')
                     {
                         // '=='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.EqualEqual);
                     }
                     // '='
@@ -131,7 +130,7 @@ class Lexer
                     if (p == '=')
                     {
                         // '+='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.AddEqual);
                     }
                     // '+'
@@ -142,7 +141,7 @@ class Lexer
                     if (p == '=')
                     {
                         // '-='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.SubEqual);
                     }
                     // '-'
@@ -153,7 +152,7 @@ class Lexer
                     if (p == '=')
                     {
                         // '*='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.MultEqual);
                     }
                     // '*'
@@ -164,7 +163,7 @@ class Lexer
                     if (p == '=')
                     {
                         // '/='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.DivEqual);
                     }
                     else if (p == '/')
@@ -183,7 +182,7 @@ class Lexer
                     if (p == '=')
                     {
                         // '!='
-                        length++;
+                        m_length++;
                         return AddToken(TknType.NotEqual);
                     }
                     // '!'
@@ -227,7 +226,7 @@ class Lexer
             }
         }
 
-        if (length > 0x80)
+        if (m_length > 0x80)
         {
             Utils.TODO("Handle lexing large number literals");
             return Status.Failure;
@@ -276,41 +275,41 @@ class Lexer
             else if (c == '\n')
             {
                 Advance();
-                line++;
+                m_line++;
             }
             else { break; }
         }
     }
 
-    void Advance() { ++index; }
-    void AdvanceWithLength() { ++index; ++length; }
+    void Advance() { ++m_index; }
+    void AdvanceWithLength() { ++m_index; ++m_length; }
 
     void SaveState()
     {
-        save_index = index;
-        save_length = length;
-        save_line = line;
+        save_index = m_index;
+        save_length = m_length;
+        save_line = m_line;
     }
 
     void RestoreState()
     {
-        index = save_index;
-        length = save_length;
-        line = save_line;
+        m_index = save_index;
+        m_length = save_length;
+        m_line = save_line;
     }
 
 
     // NOTE: casted are safe within range due to length check during ReadFile 
-    char CurrentChar() { return file[(int)index]; }
-    char PeekChar() { return file[(int)index + 1]; }
-    char PastChar() { return file[(int)index - 1]; }
+    char CurrentChar() { return m_file[(int)m_index]; }
+    char PeekChar() { return m_file[(int)m_index + 1]; }
+    char PastChar() { return m_file[(int)m_index - 1]; }
     // is not end of file
-    bool IsNotEOF() { return index < (uint)file.Length; }
+    bool IsNotEOF() { return m_index < (uint)m_file.Length; }
 
     Status AddToken(TknType type)
     {
-        tokens.Add(new Token(index, length, line, type));
-        index += length;
+        m_tokens.Add(new Token(m_index, m_length, m_line, type));
+        m_index += m_length;
         return Status.Success;
     }
 }

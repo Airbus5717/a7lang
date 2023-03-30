@@ -12,7 +12,7 @@ public enum Status : byte
 public class Utils
 {
     // TODO: use a stdlib logger
-    private static readonly string[] logStrings = {
+    private static readonly string[] m_logStrings = {
         "[ERROR]: ", "[INFO] : ", "[WARN] : ", "[TIME] : "
     };
 
@@ -39,7 +39,7 @@ public class Utils
     private static void Log(ConsoleColor c, int i, string s)
     {
         Console.ForegroundColor = c;
-        Console.Write(logStrings[i]);
+        Console.Write(m_logStrings[i]);
         Console.ResetColor();
         Console.WriteLine(s);
     }
