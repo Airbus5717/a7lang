@@ -11,7 +11,7 @@ class Lexer
     Lexer(ref string file)
     {
         this.m_file = file;
-        this.m_tokens = new List<Token>();
+        this.m_tokens = new List<Token>(100);
         this.m_line = 1;
     }
 
@@ -249,8 +249,31 @@ class Lexer
 
     Status LexIdentifier()
     {
-        Utils.TODO("Lex identifier literals");
-        return Status.Failure;
+        AdvanceWithLength();
+        while (Char.IsAsciiLetterOrDigit(CurrentChar()) || CurrentChar() == '_')
+        {
+            AdvanceWithLength();
+        }
+        // restore the index for comparing
+        m_index -= m_length;
+
+        TknType type = TknType.Identifier;
+        switch (m_length)
+        {
+            case 2:
+            default:
+                break;
+
+        }
+
+        if (m_length > 0x80)
+        {
+            Utils.TODO("Handle long Identifiers");
+            RestoreState();
+            return Status.Failure;
+        }
+
+        return AddToken(type);
     }
 
     Status LexChar()
@@ -299,12 +322,13 @@ class Lexer
     }
 
 
-    // NOTE: casted are safe within range due to length check during ReadFile 
+    //! NOTE: casted are safe within range due to length check during ReadFile 
     char CurrentChar() { return m_file[(int)m_index]; }
     char PeekChar() { return m_file[(int)m_index + 1]; }
     char PastChar() { return m_file[(int)m_index - 1]; }
     // is not end of file
     bool IsNotEOF() { return m_index < (uint)m_file.Length; }
+
 
     Status AddToken(TknType type)
     {

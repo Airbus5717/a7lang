@@ -7,7 +7,7 @@ public enum Status : byte
     Done,
 }
 
-public enum Res
+public enum Res : byte
 {
     Ok,
     Err,
@@ -72,7 +72,7 @@ public class Utils
             if (s.Length >= (int.MaxValue >> 2))
             {
                 LogErr("Too Large file: " + path);
-                return null;
+                return new Result<string>("", Res.Err);
             }
 
             // add padding nul chars

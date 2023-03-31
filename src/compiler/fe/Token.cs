@@ -24,12 +24,13 @@ enum TknType : byte
     // In, // in
     As, // 'as'
     DeleteKeyword, // 'del'
+    NewKeyword, // 'new'
     Equal, // =
     IntegerLiteral, // refers to 10 digits ints
     IntKeyword, // 'int'
     UintKeyword, // 'uint'
     FloatLiteral, // refer to floats
-    FloatKeyword, // 'float'
+    FloatKeyword, // 'flt'
     StringLiteral, // refer to strings
     CharLiteral, // refers to chars
     CharKeyword, // 'char'
@@ -73,7 +74,7 @@ enum TknType : byte
     MatchKeyword, // 'match' basically switch
     EnumKeyword, // 'enum'
     EqualEqual, // ==
-    EscKeyword, // 'escape' basically break
+    BrkKeyword, // 'break' 
     AddEqual, // +=
     SubEqual, // -=
     MultEqual, // *=
