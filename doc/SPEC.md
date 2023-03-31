@@ -23,14 +23,6 @@ which will compile to a subset of C and then use a C compiler to generate execut
     for example
     N for numbers(ints+floats)
 
-## WILL NOT HAVE
-- Exceptions
-- Classes (Inheritence/Encapsulation etc. OOP stuff)
-- Operator overloading 
-- Full Polymorphic parameters support (aka generics) 
-- Extra Syntax bloat that might blow up the complier src code
-- Insert your X feature (prob NOT)
-
 ### things to discuss 
 - Maybe features above
 - elif syntax
@@ -39,6 +31,16 @@ which will compile to a subset of C and then use a C compiler to generate execut
  or u32, i32, f32 etc. 
 - loops syntax
 - reusing `as` as `cast` or `cast` as `as`
+
+
+## WILL NOT HAVE
+- Exceptions
+- Classes (Inheritence/Encapsulation etc. OOP stuff)
+- Operator overloading 
+- Full Polymorphic parameters support (aka generics) 
+- Extra Syntax bloat that might blow up the complier src code
+- Insert your X feature (prob NOT)
+
 
 
 ## Keywords
