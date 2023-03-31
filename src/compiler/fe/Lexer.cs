@@ -322,7 +322,7 @@ class Lexer
     }
 
 
-    //! NOTE: casted are safe within range due to length check during ReadFile 
+    //! NOTE: casted are safe within range due to length check during ReadFile
     char CurrentChar() { return m_file[(int)m_index]; }
     char PeekChar() { return m_file[(int)m_index + 1]; }
     char PastChar() { return m_file[(int)m_index - 1]; }
