@@ -1,3 +1,6 @@
-# Another rotate programming language implementation
+# A7 programming language
 
-i am using Csharp for prototyping the compiler
+> **Warning** Still in development, this language might never reach production
+
+check examples folder for a hello world example (might change)
+check doc/SPEC.md for current language design 
