@@ -75,6 +75,8 @@ which will compile to a subset of C and then use a C compiler to generate execut
 - cast (change type (not all casts are allowed))
 - defer
 - as
+### Tokens
+see file in `src/compiler/fe/Token.cs` 
 
 ## Syntax examples
 
@@ -134,17 +136,14 @@ if (cond) {
 
 ### loops 
 ```cpp
-while (true) {
+for {
+    // infinite loop
     break;
-}
+} 
 
 for (i := 0; i < 10; i += 1) {
     // i++ or ++i is not allowed 
     // due to complexity of the design
-}
-
-for (i; 0..10) {
-    // same as for(int i = 0; i < 10; i++)
 }
 
 for (i, v; arr) {
@@ -166,8 +165,8 @@ layout Vec2 {
 ```cpp
 x := new Vec2;
 if (x == nil) { os.exit(1); } // todo: make handling errors better
-defer del x;
 x.x = 1; x.y = 2;
+del x;
 
 
 
@@ -175,7 +174,7 @@ x.x = 1; x.y = 2;
 
 y := new Vec2[10]; // []Vec3 with size 10;
 y.count // count is more accurate term than length 
-del y; // 
+del y; //  
 ```
 
 
