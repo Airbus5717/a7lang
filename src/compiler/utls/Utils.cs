@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 public enum Status : byte
 {
@@ -32,6 +33,9 @@ public class Utils
         "[ERROR]: ", "[INFO] : ", "[WARN] : ", "[TIME] : "
     };
 
+    public static uint NULL_TERMINATORS_COUNT_FILE_READ = 10;
+    public static uint NULL_TERMINATORS_COUNT_PASSES = 3;
+
     public static void LogErr(string s)
     {
         Log(ConsoleColor.Red, 0, s);
@@ -64,9 +68,17 @@ public class Utils
     {
         if (Path.Exists(path))
         {
-            string s = File.ReadAllText(path);
-
-
+            string s;
+            try
+            {
+                //! Exception is considered a bad practice
+                s = File.ReadAllText(path);
+            }
+            catch (Exception e)
+            {
+                LogErr(e.Message);
+                return new Result<string>("", Res.Err);
+            }
             // NOTE: Very important check
             // due to some casts later on
             if (s.Length >= (int.MaxValue >> 2))
@@ -76,10 +88,10 @@ public class Utils
             }
 
             // add padding nul chars
-            var padding = new char[10];
+            char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
             Array.Fill(padding, char.MinValue);
 
-            return new Result<string>(s + padding);
+            return new Result<string>(new string(s + new string(padding)));
         }
 
         LogErr("File [" + path + "] not found");
@@ -89,6 +101,12 @@ public class Utils
     public static void Exit(int x)
     {
         Environment.Exit(x);
+    }
+
+
+    public static void assert(bool expr)
+    {
+        Debug.Assert(expr);
     }
 
     public static void TODO(string text,

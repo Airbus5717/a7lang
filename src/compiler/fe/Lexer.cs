@@ -1,22 +1,23 @@
 
 class Lexer
 {
-    List<Token> m_tokens;
+    public List<Token> m_tokens;
     uint m_index, m_length, m_line;
     readonly string m_file;
 
     // save state variables
     uint save_index, save_length, save_line;
 
-    Lexer(ref string file)
+    public Lexer(ref string file)
     {
         this.m_file = file;
         this.m_tokens = new List<Token>(100);
         this.m_line = 1;
+        this.m_index = 0;
     }
 
     // NOTE(5717): Lexer starting point
-    Status Lex()
+    public Status Lex()
     {
         Status s = Status.Failure;
 
@@ -39,10 +40,9 @@ class Lexer
     {
         char c = CurrentChar(), p = PeekChar();
 
-        m_length = 1; // reset length
+        m_length = 0; // reset length
 
         SkipWhitespace();
-
         if (Char.IsAsciiDigit(c))
             return LexNumeric();
 
@@ -54,6 +54,10 @@ class Lexer
 
         if (c == '\'')
             return LexChar();
+
+
+        if (c == '@')
+            return LexBuiltin();
 
         switch (c)
         {
@@ -71,12 +75,13 @@ class Lexer
             case '^': return AddToken(TknType.BitwiseXor);
             case '.':
                 {
-                    if (p == '.')
-                    {
-                        // '..'
-                        m_length++;
-                        return AddToken(TknType.To);
-                    }
+                    // if (p == '.')
+                    // {
+                    //     // '..'
+                    //     m_length++;
+                    //     return AddToken(TknType.To);
+                    // }
+
                     // '.'
                     return AddToken(TknType.Dot);
                 }
@@ -134,7 +139,7 @@ class Lexer
                         return AddToken(TknType.AddEqual);
                     }
                     // '+'
-                    return AddToken(TknType.Plus);
+                    return AddToken(TknType.PlusOperator);
                 }
             case '-':
                 {
@@ -145,7 +150,7 @@ class Lexer
                         return AddToken(TknType.SubEqual);
                     }
                     // '-'
-                    return AddToken(TknType.Minus);
+                    return AddToken(TknType.MinusOperator);
                 }
             case '*':
                 {
@@ -156,7 +161,7 @@ class Lexer
                         return AddToken(TknType.MultEqual);
                     }
                     // '*'
-                    return AddToken(TknType.Mult);
+                    return AddToken(TknType.MultOperator);
                 }
             case '/':
                 {
@@ -175,7 +180,7 @@ class Lexer
                     }
                     // TODO: Implement Multiline comments
                     // '/'
-                    return AddToken(TknType.Div);
+                    return AddToken(TknType.DivOperator);
                 }
             case '!':
                 {
@@ -188,16 +193,23 @@ class Lexer
                     // '!'
                     return AddToken(TknType.Not);
                 }
+            case ' ':
+                Advance();
+                return Status.Success;
+            case '\n':
+                Advance();
+                return Status.Success;
             case char.MinValue: // '\0'
                 {
-                    AddToken(TknType.EOT);
-                    AddToken(TknType.EOT);
-                    AddToken(TknType.EOT);
+                    // NOTE(5717): Extra END OF TOKENS delimiters
+                    for (uint i = 0; i < Utils.NULL_TERMINATORS_COUNT_PASSES; ++i)
+                        AddToken(TknType.EOT);
                     return Status.Done;
                 }
             default:
                 break;
         }
+        Utils.LogErr("Uknown Char [" + c + "]");
         return Status.Failure;
     }
 
@@ -216,6 +228,7 @@ class Lexer
         }
 
         bool reached_dot = false;
+        AdvanceWithLength();
         while (Char.IsAsciiDigit(CurrentChar()) || CurrentChar() == '.')
         {
             AdvanceWithLength();
@@ -231,19 +244,34 @@ class Lexer
             Utils.TODO("Handle lexing large number literals");
             return Status.Failure;
         }
-
+        RestoreIndex();
         return AddToken(reached_dot ? TknType.FloatLiteral : TknType.IntegerLiteral);
     }
 
     Status LexHexIntLiteral()
     {
         Utils.TODO("Lex Hexadecimal integer literals");
+        AdvanceWithLength(); // '0'
+        AdvanceWithLength(); // 'x'
+
+        RestoreIndex();
         return Status.Failure;
     }
 
     Status LexBinaryIntLiteral()
     {
         Utils.TODO("Lex binary integer literals");
+        AdvanceWithLength(); // '0'
+        AdvanceWithLength(); // 'b'
+
+        RestoreIndex();
+        return Status.Failure;
+    }
+
+
+    Status LexBuiltin()
+    {
+        Utils.TODO("Lex Builtin ");
         return Status.Failure;
     }
 
@@ -255,9 +283,11 @@ class Lexer
             AdvanceWithLength();
         }
         // restore the index for comparing
-        m_index -= m_length;
+        RestoreIndex();
+
 
         TknType type = TknType.Identifier;
+        Utils.TODO("implement keyword matcher");
         switch (m_length)
         {
             case 2:
@@ -269,7 +299,6 @@ class Lexer
         if (m_length > 0x80)
         {
             Utils.TODO("Handle long Identifiers");
-            RestoreState();
             return Status.Failure;
         }
 
@@ -279,13 +308,15 @@ class Lexer
     Status LexChar()
     {
         Utils.TODO("Lex character literals");
+        AdvanceWithLength(); RestoreIndex();
         return Status.Failure;
     }
 
     Status LexString()
     {
-        // Utils.TODO("Lex string literals");
-        AdvanceWithLength();
+        Utils.TODO("Lex string literals");
+        Advance();
+        RestoreIndex();
         return Status.Failure;
     }
 
@@ -305,7 +336,7 @@ class Lexer
     }
 
     void Advance() { ++m_index; }
-    void AdvanceWithLength() { ++m_index; ++m_length; }
+    void AdvanceWithLength() { Advance(); ++m_length; }
 
     void SaveState()
     {
@@ -322,18 +353,24 @@ class Lexer
     }
 
 
+    void RestoreIndex()
+    {
+        m_index -= m_length;
+    }
+
     //! NOTE: casted are safe within range due to length check during ReadFile
-    char CurrentChar() { return m_file[(int)m_index]; }
-    char PeekChar() { return m_file[(int)m_index + 1]; }
-    char PastChar() { return m_file[(int)m_index - 1]; }
+    char CurrentChar() { return m_file[(int)(m_index)]; }
+    char PeekChar() { return m_file[(int)(m_index + 1)]; }
+    char PastChar() { return m_file[(int)(m_index - 1)]; }
     // is not end of file
-    bool IsNotEOF() { return m_index < (uint)m_file.Length; }
+    bool IsNotEOF() { return (int)(m_index) < m_file.Length; }
 
 
     Status AddToken(TknType type)
     {
         m_tokens.Add(new Token(m_index, m_length, m_line, type));
-        m_index += m_length;
+        m_index += m_length + 1;
         return Status.Success;
     }
+
 }

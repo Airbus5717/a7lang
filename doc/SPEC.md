@@ -67,14 +67,15 @@ which will compile to a subset of C and then use a C compiler to generate execut
 - enum (ints only, defaults to the smallest size)
 - break (only in loops)
 - fall (only in switch stmts(match))
-- layout (struct) (classes without methods)
+- record (struct) (classes without methods)
 - ref (pointer) (raw pointers, but pointer arithmatic is not allowed)
 - nil (null)
-- as (alias) (for imports)
+- as (alias) (for imports, maybe types?)
 - continue
 - cast (change type (not all casts are allowed))
 - defer
 - as
+- using 
 ### Tokens
 see file in `src/compiler/fe/Token.cs` 
 
@@ -82,7 +83,7 @@ see file in `src/compiler/fe/Token.cs`
 
 ### Hello World Function
 ```cpp
-load "std/io"; 
+load "std/io";
 
 fn main() {
     println("Hello, World");
@@ -138,7 +139,7 @@ if (cond) {
 ```cpp
 for {
     // infinite loop
-    break;
+    break; 
 } 
 
 for (i := 0; i < 10; i += 1) {
@@ -155,7 +156,7 @@ for (i, v; arr) {
 no methods, sorry
 u gotta create them manually
 ```
-layout Vec2 {
+record Vec2 {
     x: uint;
     y: uint;
 }

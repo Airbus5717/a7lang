@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/rotate-cs.csproj",
+                "${workspaceFolder}/A7.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/rotate-cs.csproj",
+                "${workspaceFolder}/A7.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/rotate-cs.csproj"
+                "${workspaceFolder}/A7.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

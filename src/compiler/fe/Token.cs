@@ -17,11 +17,8 @@ struct Token
 
 enum TknType : byte
 {
-    Identifier = 0, // ids
-    BuiltinFunc, //? @ids
-    To, // ..
-    // ToEQL, // ..=
-    // In, // in
+    Identifier, // ids
+    BuiltinFunc, // @id
     As, // 'as'
     DeleteKeyword, // 'del'
     NewKeyword, // 'new'
@@ -34,16 +31,16 @@ enum TknType : byte
     StringLiteral, // refer to strings
     CharLiteral, // refers to chars
     CharKeyword, // 'char'
-    TrueLiteral, // 'correct'
-    FalseLiteral, // 'wrong'
+    TrueLiteral, // 'true'
+    FalseLiteral, // 'false'
     BoolKeyword, // 'bool'
     SemiColon, // ;
     Colon, // :
     FunctionKeyword, // 'fn'
-    Plus, // +
-    Minus, // -
-    Mult, // *
-    Div, // /
+    PlusOperator, // +
+    MinusOperator, // -
+    MultOperator, // *
+    DivOperator, // /
     OpenParen, // (
     CloseParen, // )
     OpenCurly, // {
@@ -55,6 +52,7 @@ enum TknType : byte
     IfKeyword, // 'if'
     ElseKeyword, // 'else'
     ForKeyword, // 'for'
+    ForEachKeyword, // 'foreach'
     Greater, // >
     GreaterEql, // >=
     Less, // <
@@ -64,9 +62,9 @@ enum TknType : byte
     NotEqual, // "!="
     AndKeyword, // 'and' logical and
     BitwiseAnd, // &
-    BitwiseOr, // | 
+    BitwiseOr, // |
     BitwiseXor, // ^
-    LeftShift, // << 
+    LeftShift, // <<
     RightShift, // >>
     OrKeyword, // 'or' logical or
     Comma, // ,
@@ -74,15 +72,18 @@ enum TknType : byte
     MatchKeyword, // 'match' basically switch
     EnumKeyword, // 'enum'
     EqualEqual, // ==
-    BrkKeyword, // 'break' 
+    BrkKeyword, // 'break'
+    FallKeyword, // 'fall'
     AddEqual, // +=
     SubEqual, // -=
     MultEqual, // *=
-    LayoutKeyword, // 'layout' basically struct
+    RecordKeyword, // 'record' basically struct
     DivEqual, // /=
     RefKeyword, // 'ref' // TODO later
     NilLiteral, // `nil` basically null
     EOT, // END OF TOKENS (last token type in list)
 
+
+    // WARN: Never use this as a token type
     COUNT, // Used for counting the number of members of the enum
 }
