@@ -4,6 +4,6 @@ class Program
 {
     static void Main(string[] args)
     {
-        Compiler.compile(new CompileOptions("main.a7"));
+        A7.Compiler.compile(new A7.CompileOptions("main.a7"));
     }
 }

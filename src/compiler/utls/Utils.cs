@@ -34,7 +34,7 @@ public class Utils
     };
 
     public static uint NULL_TERMINATORS_COUNT_FILE_READ = 10;
-    public static uint NULL_TERMINATORS_COUNT_PASSES = 3;
+    public static uint NULL_TERMINATORS_COUNT_PASSES = 5;
 
     public static void LogErr(string s)
     {
@@ -91,7 +91,7 @@ public class Utils
             char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
             Array.Fill(padding, char.MinValue);
 
-            return new Result<string>(new string(s + new string(padding)));
+            return new Result<string>(new string(s + '\n' + new string(padding)));
         }
 
         LogErr("File [" + path + "] not found");
