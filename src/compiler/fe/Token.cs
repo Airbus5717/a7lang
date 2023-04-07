@@ -1,7 +1,7 @@
 
 namespace A7
 {
-    struct Token
+    public struct Token
     {
         public uint index, length, line;
         public TknType type;
@@ -16,7 +16,7 @@ namespace A7
         }
     }
 
-    enum TknType : byte
+    public enum TknType : byte
     {
         Identifier, // ids
         BuiltinFunc, // @id

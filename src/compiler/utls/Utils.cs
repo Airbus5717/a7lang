@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using A7;
 
 public enum Status : byte
 {
@@ -33,8 +34,8 @@ public class Utils
         "[ERROR]: ", "[INFO] : ", "[WARN] : ", "[TIME] : "
     };
 
-    public static uint NULL_TERMINATORS_COUNT_FILE_READ = 10;
-    public static uint NULL_TERMINATORS_COUNT_PASSES = 5;
+    public static int NULL_TERMINATORS_COUNT_FILE_READ = 10;
+    public static int NULL_TERMINATORS_COUNT_PASSES = 5;
 
     public static void LogErr(string s)
     {
@@ -88,14 +89,21 @@ public class Utils
             }
 
             // add padding nul chars
-            char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
-            Array.Fill(padding, char.MinValue);
 
-            return new Result<string>(new string(s + '\n' + new string(padding)));
+
+            return new Result<string>(prepareStrForParsing(s));
         }
 
         LogErr("File [" + path + "] not found");
         return new Result<string>("", Res.Err);
+    }
+
+    public static string prepareStrForParsing(string s)
+    {
+        char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
+        Array.Fill(padding, char.MinValue);
+        s = s + '\n' + new string(padding);
+        return s;
     }
 
     public static void Exit(int x)

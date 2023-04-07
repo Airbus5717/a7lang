@@ -257,7 +257,6 @@ namespace A7
 
         Status LexHexIntLiteral()
         {
-            Utils.TODO("Lex Hexadecimal integer literals");
             AdvanceWithLength(); // '0'
             AdvanceWithLength(); // 'x'
 
@@ -280,7 +279,6 @@ namespace A7
 
         Status LexBinaryIntLiteral()
         {
-            Utils.TODO("Lex binary integer literals");
             AdvanceWithLength(); // '0'
             AdvanceWithLength(); // 'b'
 
@@ -359,10 +357,8 @@ namespace A7
         //     char c = CurrentChar(), p = PeekChar();
         //     while (true)
         //     {
-
         //         if (c == '/' && p == '*') { deepness++; Advance(); Advance(); }
         //         if (c == '*' && p == '/') { deepness--; Advance(); Advance(); }
-
         //         // update
         //         Advance();
         //         c = p;
@@ -370,7 +366,6 @@ namespace A7
         //         if (deepness == 0) break;
         //         if (p == char.MinValue) break;
         //     }
-
         //     Advance();
         //     return deepness == 0 ? Status.Success : Status.Failure;
         // }
