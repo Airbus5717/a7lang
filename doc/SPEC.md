@@ -30,7 +30,6 @@ which will compile to a subset of C and then use a C compiler to generate execut
  either uint, int etc. 
  or u32, i32, f32 etc. 
 - loops syntax
-- reusing `as` as `cast` or `cast` as `as`
 
 
 ## WILL NOT HAVE
@@ -40,7 +39,6 @@ which will compile to a subset of C and then use a C compiler to generate execut
 - Full Polymorphic parameters support (aka generics) 
 - Extra Syntax bloat that might blow up the complier src code
 - Insert your X feature (prob NOT)
-
 
 
 ## Keywords
@@ -55,7 +53,7 @@ which will compile to a subset of C and then use a C compiler to generate execut
 - bool (builtin type)
 - fn (function)
 - ret (return)
-- load (import)
+- import
 - if 
 - elif (is it needed?)
 - else 
@@ -68,30 +66,24 @@ which will compile to a subset of C and then use a C compiler to generate execut
 - break (only in loops)
 - fall (only in switch stmts(match))
 - record (struct) (classes without methods)
+- variant (tagged union)
 - ref (pointer) (raw pointers, but pointer arithmatic is not allowed)
 - nil (null)
-- as (alias) (for imports, maybe types?)
 - continue
 - cast (change type (not all casts are allowed))
 - defer
 - as
 - using 
+
 ### Tokens
 see file in `src/compiler/fe/Token.cs` 
 
 ## Syntax examples
 
 ### Hello World Function
-```cpp
-load "std/io";
 
-fn main() {
-    println("Hello, World");
-}
-```
-another hello world
 ```cpp
-load "std/io" as io;
+import "std/io";
 
 fn main() {
     io.println("Hello World");
@@ -111,11 +103,11 @@ fn main() {
 
 ### function
 ```cpp
-load "std/io"; 
+import "std/io"; 
 
 fn main() {
-    print_i(add(1, 2));
-    println("");
+    io.print_i(add(1, 2));
+    io.println("");
 }
 // to show the order of def is not important
 fn add(x: int, y: int) int { ret x + y; }

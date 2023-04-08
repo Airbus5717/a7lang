@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
-using A7;
 
 public enum Status : byte
 {
@@ -34,33 +33,33 @@ public class Utils
         "[ERROR]: ", "[INFO] : ", "[WARN] : ", "[TIME] : "
     };
 
-    public static int NULL_TERMINATORS_COUNT_FILE_READ = 10;
-    public static int NULL_TERMINATORS_COUNT_PASSES = 5;
+    public const int NULL_TERMINATORS_COUNT_FILE_READ = 10;
+    public const int NULL_TERMINATORS_COUNT_PASSES = 5;
 
     public static void LogErr(string s)
     {
-        Log(ConsoleColor.Red, 0, s);
+        Log(ConsoleColor.Red, m_logStrings[0], s);
     }
 
     public static void LogInfo(string s)
     {
-        Log(ConsoleColor.Green, 1, s);
+        Log(ConsoleColor.Green, m_logStrings[1], s);
     }
 
     public static void LogWarn(string s)
     {
-        Log(ConsoleColor.Yellow, 2, s);
+        Log(ConsoleColor.Yellow, m_logStrings[2], s);
     }
 
     public static void LogTime(string s)
     {
-        Log(ConsoleColor.Magenta, 3, s);
+        Log(ConsoleColor.Magenta, m_logStrings[3], s);
     }
 
-    private static void Log(ConsoleColor c, int i, string s)
+    public static void Log(ConsoleColor c, string i, string s)
     {
         Console.ForegroundColor = c;
-        Console.Write(m_logStrings[i]);
+        Console.Write(i);
         Console.ResetColor();
         Console.WriteLine(s);
     }
@@ -69,7 +68,7 @@ public class Utils
     {
         if (Path.Exists(path))
         {
-            string s;
+            string s = "";
             try
             {
                 //! Exception is considered a bad practice
@@ -85,12 +84,10 @@ public class Utils
             if (s.Length >= (int.MaxValue >> 2))
             {
                 LogErr("Too Large file: " + path);
-                return new Result<string>("", Res.Err);
+                return new Result<string>(s, Res.Err);
             }
 
             // add padding nul chars
-
-
             return new Result<string>(prepareStrForParsing(s));
         }
 
@@ -100,6 +97,7 @@ public class Utils
 
     public static string prepareStrForParsing(string s)
     {
+        // add newline + '\0' s
         char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
         Array.Fill(padding, char.MinValue);
         s = s + '\n' + new string(padding);

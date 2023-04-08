@@ -1,20 +1,22 @@
 namespace A7
 {
-    class Lexer
+    public class Lexer
     {
         public List<Token> m_tokens;
-        uint m_index, m_length, m_line;
-        readonly string m_file;
-
+        public uint m_index, m_length, m_line;
+        public readonly string m_file, filename;
+        public ErrKind error;
         // save state variables
-        uint save_index, save_length, save_line;
+        public uint save_index, save_length, save_line;
 
-        public Lexer(ref string file)
+        public Lexer(string filename, ref string file)
         {
             this.m_file = file;
+            this.filename = filename;
             this.m_tokens = new List<Token>(100);
             this.m_line = 1;
             this.m_index = 0;
+            this.error = ErrKind.UNKNOWN;
         }
 
         // NOTE(5717): Lexer starting point
@@ -26,13 +28,13 @@ namespace A7
             {
                 s = LexDirector();
                 if (s == Status.Success) continue;
+                // else (Done | Failure)
                 break;
             }
 
             if (s == Status.Failure)
             {
-                RestoreState();
-                Utils.TODO("implement Error message in lexer");
+                Err.LexerErrMsg(this);
             }
             return s;
         }
@@ -214,7 +216,7 @@ namespace A7
                 default:
                     break;
             }
-            Utils.LogErr("Unknown Char [" + c.ToString() + "]");
+            error = ErrKind.UNKNOWN;
             return Status.Failure;
         }
 
@@ -248,7 +250,7 @@ namespace A7
             // TODO: handle lex large numerics
             if (m_length > 0x80)
             {
-                Utils.TODO("Handle lexing large number literals");
+                error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
             }
             RestoreIndex();
@@ -269,7 +271,7 @@ namespace A7
             // TODO: handle lex large numerics
             if (m_length > 20)
             {
-                Utils.TODO("Handle lexing large hex int literals");
+                error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
             }
 
@@ -289,7 +291,7 @@ namespace A7
             // TODO: handle lex large numerics
             if (m_length > 66)
             {
-                Utils.TODO("Handle lexing large hex int literals");
+                error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
             }
 
@@ -344,7 +346,7 @@ namespace A7
         {
             Utils.TODO("Lex string literals");
             Advance();
-            RestoreIndex();
+            error = ErrKind.STR_NOT_CLOSED;
             return Status.Failure;
         }
 
@@ -388,19 +390,19 @@ namespace A7
         void Advance() { ++m_index; }
         void AdvanceWithLength() { Advance(); ++m_length; }
 
-        void SaveState()
-        {
-            save_index = m_index;
-            save_length = m_length;
-            save_line = m_line;
-        }
+        // void SaveState()
+        // {
+        //     save_index = m_index;
+        //     save_length = m_length;
+        //     save_line = m_line;
+        // }
 
-        void RestoreState()
-        {
-            m_index = save_index;
-            m_length = save_length;
-            m_line = save_line;
-        }
+        // void RestoreState()
+        // {
+        //     m_index = save_index;
+        //     m_length = save_length;
+        //     m_line = save_line;
+        // }
 
 
         void RestoreIndex()

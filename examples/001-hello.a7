@@ -1,4 +1,4 @@
-load "std/io" as io;
+import "std/io";
 
 fn main() {
     io.println("Hello, World");

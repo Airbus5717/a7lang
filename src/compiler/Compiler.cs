@@ -34,7 +34,7 @@ namespace A7
 
 
             // STAGE: Lex File
-            var lexer = new Lexer(ref myFile.m_item);
+            var lexer = new Lexer(opts.path, ref myFile.m_item);
             if (lexer.Lex() == Status.Failure)
                 return Status.Failure;
 

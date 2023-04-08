@@ -26,7 +26,7 @@ namespace A7
         Equal, // =
         IntegerLiteral, // refers to 10 digits ints
         IntKeyword, // 'int'
-        UintKeyword, // 'uint'
+        UIntKeyword, // 'uint'
         FloatLiteral, // refer to floats
         FloatKeyword, // 'flt'
         StringLiteral, // refer to strings
@@ -49,7 +49,7 @@ namespace A7
         OpenSQRBrackets, // [
         CloseSQRBrackets, // ]
         ReturnKeyword, // 'ret'
-        LoadKeyword, // 'load' basically import
+        ImportKeyword, // 'import'
         IfKeyword, // 'if'
         ElseKeyword, // 'else'
         ForKeyword, // 'for'
@@ -73,13 +73,14 @@ namespace A7
         MatchKeyword, // 'match' basically switch
         EnumKeyword, // 'enum'
         EqualEqual, // ==
-        BrkKeyword, // 'break'
-        FallKeyword, // 'fall'
+        BrkKeyword, // 'break' // only loops
+        FallKeyword, // 'fall' // only switch statements
         AddEqual, // +=
         SubEqual, // -=
         MultEqual, // *=
-        RecordKeyword, // 'record' basically struct
         DivEqual, // /=
+        RecordKeyword, // 'record' basically struct
+        VariantKeyword, // 'variant' basically tagged union
         RefKeyword, // 'ref' // TODO later
         NilLiteral, // `nil` basically null
         EOT, // END OF TOKENS (last token type in list)
