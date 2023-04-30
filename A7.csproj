@@ -8,6 +8,7 @@
     <Nullable>disable</Nullable>
     <StartupObject>A7CLI.Program</StartupObject>
     <IsPackable>false</IsPackable>
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
 
