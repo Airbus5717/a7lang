@@ -5,8 +5,9 @@ namespace A7
         public List<Token> m_tokens;
         public int m_index, m_length, m_line;
         public readonly string m_file, filename;
-        public ErrKind error;
+        public ErrKind m_error;
         // save state variables
+        // for restoring state in error flow
         public int save_index, save_length, save_line;
 
         public Lexer(string filename, ref string file)
@@ -16,7 +17,7 @@ namespace A7
             this.m_tokens = new List<Token>(100);
             this.m_line = 1;
             this.m_index = 0;
-            this.error = ErrKind.UNKNOWN;
+            this.m_error = ErrKind.UNKNOWN;
         }
 
         // NOTE(5717): Lexer starting point
@@ -216,7 +217,7 @@ namespace A7
                 default:
                     break;
             }
-            error = ErrKind.UNKNOWN;
+            m_error = ErrKind.UNKNOWN;
             return Status.Failure;
         }
 
@@ -250,7 +251,7 @@ namespace A7
             // TODO: handle lex large numerics
             if (m_length > 0x80)
             {
-                error = ErrKind.NUM_TOO_LONG;
+                m_error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
             }
             RestoreIndex();
@@ -271,7 +272,7 @@ namespace A7
             // TODO: handle lex large numerics
             if (m_length > 20)
             {
-                error = ErrKind.NUM_TOO_LONG;
+                m_error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
             }
 
@@ -291,7 +292,7 @@ namespace A7
             // TODO: handle lex large numerics
             if (m_length > 66)
             {
-                error = ErrKind.NUM_TOO_LONG;
+                m_error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
             }
 
@@ -317,18 +318,56 @@ namespace A7
 
 
             TknType type = TknType.Identifier;
-
+            // TODO: optimize Keyword comparing (profile before optimizing)
             switch (m_length)
             {
                 case 2:
                     {
-                        if (m_file.Substring(m_index, m_length).Equals("if"))
-                        {
-                            type = TknType.IfKeyword;
-                            break;
-                        }
+                        if (KeywordCmp(TknType.IfKeyword)) type = TknType.IfKeyword;
+                        else if (KeywordCmp(TknType.AsKeyword)) type = TknType.AsKeyword;
+                        else if (KeywordCmp(TknType.FnKeyword)) type = TknType.FnKeyword;
+                        break;
                     }
-                    break;
+                case 3:
+                    {
+                        if (KeywordCmp(TknType.AndKeyword)) type = TknType.AndKeyword;
+                        else if (KeywordCmp(TknType.ForKeyword)) type = TknType.ForKeyword;
+                        else if (KeywordCmp(TknType.IntKeyword)) type = TknType.IntKeyword;
+                        else if (KeywordCmp(TknType.RetKeyword)) type = TknType.RetKeyword;
+                        else if (KeywordCmp(TknType.PubKeyword)) type = TknType.PubKeyword;
+                        else if (KeywordCmp(TknType.RefKeyword)) type = TknType.RefKeyword;
+                        else if (KeywordCmp(TknType.FltKeyword)) type = TknType.FltKeyword;
+                        break;
+                    }
+                case 4:
+                    {
+                        if (KeywordCmp(TknType.ElseKeyword)) type = TknType.ElseKeyword;
+                        else if (KeywordCmp(TknType.BoolKeyword)) type = TknType.BoolKeyword;
+                        else if (KeywordCmp(TknType.CharKeyword)) type = TknType.CharKeyword;
+                        else if (KeywordCmp(TknType.EnumKeyword)) type = TknType.EnumKeyword;
+                        else if (KeywordCmp(TknType.FallKeyword)) type = TknType.FallKeyword;
+                        else if (KeywordCmp(TknType.UIntKeyword)) type = TknType.UIntKeyword;
+                        break;
+                    }
+                case 5:
+                    {
+                        if (KeywordCmp(TknType.BreakKeyword)) type = TknType.BreakKeyword;
+                        else if (KeywordCmp(TknType.MatchKeyword)) type = TknType.MatchKeyword;
+                        break;
+                    }
+                case 6:
+                    {
+                        if (KeywordCmp(TknType.DeleteKeyword)) type = TknType.DeleteKeyword;
+                        else if (KeywordCmp(TknType.ImportKeyword)) type = TknType.ImportKeyword;
+                        else if (KeywordCmp(TknType.RecordKeyword)) type = TknType.RecordKeyword;
+                        break;
+                    }
+                case 7:
+                    {
+                        if (KeywordCmp(TknType.ForEachKeyword)) type = TknType.ForEachKeyword;
+                        else if (KeywordCmp(TknType.VariantKeyword)) type = TknType.VariantKeyword;
+                        break;
+                    }
                 default:
                     break;
 
@@ -339,7 +378,6 @@ namespace A7
                 Utils.TODO("Handle long Identifiers");
                 return Status.Failure;
             }
-            Utils.TODO("implement keyword matcher");
 
             return AddToken(type);
         }
@@ -355,13 +393,14 @@ namespace A7
         {
             Utils.TODO("Lex string literals");
             Advance();
-            error = ErrKind.STR_NOT_CLOSED;
+            m_error = ErrKind.STR_NOT_CLOSED;
             return Status.Failure;
         }
 
         Status LexMultiLineComments()
         {
             // TODO: Fix the Bugs
+            Utils.TODO("implement Lex Multi line comments; Nested comments too");
             Advance(); // '/'
             Advance(); // '*'
             uint deepness = 1;
@@ -397,7 +436,7 @@ namespace A7
         }
 
         void Advance() { ++m_index; }
-        void AdvanceWithLength() { Advance(); ++m_length; }
+        void AdvanceWithLength() { ++m_index; ++m_length; }
 
         //* NOTE(5717): REMOVED THE NEED FOR RESTORE STATE
         // void SaveState()
@@ -426,10 +465,10 @@ namespace A7
         // is not end of file
         bool IsNotEOF() { return (m_index < m_file.Length); }
 
-        bool KeywordCmp(TknType tkn)
+        bool KeywordCmp(TknType type)
         {
             return m_file.Substring(m_index, m_length) ==
-                TokenMethods.GetKeywordStr(tkn);
+                TokenMethods.GetKeywordStr(type);
         }
 
         Status AddToken(TknType type)

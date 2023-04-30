@@ -7,28 +7,35 @@ namespace A7
         {
             switch (type)
             {
+                // NOTE: 2 chars
                 case TknType.IfKeyword: return "if";
-                case TknType.ElseKeyword: return "else";
+                case TknType.FnKeyword: return "fn";
+                case TknType.AsKeyword: return "as";
+                // NOTE: 3 chars
                 case TknType.AndKeyword: return "and";
                 case TknType.ForKeyword: return "for";
-                case TknType.BrkKeyword: return "break";
                 case TknType.IntKeyword: return "int";
                 case TknType.RefKeyword: return "ref";
+                case TknType.RetKeyword: return "ret";
+                case TknType.PubKeyword: return "pub";
+                case TknType.FltKeyword: return "flt";
+                // NOTE: 4 chars
+                case TknType.ElseKeyword: return "else";
                 case TknType.BoolKeyword: return "bool";
                 case TknType.CharKeyword: return "char";
                 case TknType.EnumKeyword: return "enum";
                 case TknType.FallKeyword: return "fall";
                 case TknType.UIntKeyword: return "uint";
-                case TknType.FloatKeyword: return "float";
+                // NOTE: 5 chars
+                case TknType.BreakKeyword: return "break";
                 case TknType.MatchKeyword: return "match";
+                // NOTE: 6 chars
                 case TknType.DeleteKeyword: return "delete";
                 case TknType.ImportKeyword: return "import";
-                case TknType.PublicKeyword: return "pub";
                 case TknType.RecordKeyword: return "record";
-                case TknType.ReturnKeyword: return "ret";
+                // NOTE: 7 chars
                 case TknType.ForEachKeyword: return "foreach";
                 case TknType.VariantKeyword: return "variant";
-                case TknType.FunctionKeyword: return "fn";
             }
             Utils.UNREACHABLE();
             return "";
@@ -57,7 +64,7 @@ namespace A7
     {
         Identifier, // ids
         BuiltinFunc, // @id
-        As, // 'as'
+        AsKeyword, // 'as'
         DeleteKeyword, // 'del'
         NewKeyword, // 'new'
         Equal, // =
@@ -65,16 +72,16 @@ namespace A7
         IntKeyword, // 'int'
         UIntKeyword, // 'uint'
         FloatLiteral, // refer to floats
-        FloatKeyword, // 'flt'
+        FltKeyword, // 'flt'
         StringLiteral, // refer to strings
         CharLiteral, // refers to chars
         CharKeyword, // 'char'
-        TrueLiteral, // 'true'
-        FalseLiteral, // 'false'
+        TrueLiteralKeyword, // 'true'
+        FalseLiteralKeyword, // 'false'
         BoolKeyword, // 'bool'
         SemiColon, // ;
         Colon, // :
-        FunctionKeyword, // 'fn'
+        FnKeyword, // 'fn'
         PlusOperator, // +
         MinusOperator, // -
         MultOperator, // *
@@ -85,7 +92,7 @@ namespace A7
         CloseCurly, // }
         OpenSQRBrackets, // [
         CloseSQRBrackets, // ]
-        ReturnKeyword, // 'ret'
+        RetKeyword, // 'ret'
         ImportKeyword, // 'import'
         IfKeyword, // 'if'
         ElseKeyword, // 'else'
@@ -106,11 +113,11 @@ namespace A7
         RightShift, // >>
         OrKeyword, // 'or' logical or
         Comma, // ,
-        PublicKeyword, // 'pub'
+        PubKeyword, // 'pub'
         MatchKeyword, // 'match' basically switch
         EnumKeyword, // 'enum'
         EqualEqual, // ==
-        BrkKeyword, // 'break' // only loops
+        BreakKeyword, // 'break' // only loops
         FallKeyword, // 'fall' // only switch statements
         AddEqual, // +=
         SubEqual, // -=

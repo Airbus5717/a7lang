@@ -6,7 +6,7 @@ public enum ErrKind
     UNKNOWN,
     STR_NOT_CLOSED,
     NUM_TOO_LONG,
-    
+
     // PARSER
 }
 
@@ -54,14 +54,14 @@ public class Err
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write(" error: ");
         Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine(l.error);
+        Console.WriteLine(l.m_error);
         Console.ResetColor();
         Console.WriteLine(" {0} | line src code", l.m_line);
         Console.WriteLine(" 2 | "); // TODO: proper identing
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write("> Advice: ");
         Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine("{0}", GetErrString(l.error));
+        Console.WriteLine("{0}", GetErrString(l.m_error));
         Console.ResetColor();
         PrintStage(Stage.LEXER);
     }
