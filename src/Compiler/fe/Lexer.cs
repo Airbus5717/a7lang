@@ -327,6 +327,7 @@ namespace A7
                 case 2:
                     {
                         if (KeywordCmp(TknType.IfKeyword)) type = TknType.IfKeyword;
+                        else if (KeywordCmp(TknType.OrKeyword)) type = TknType.OrKeyword;
                         else if (KeywordCmp(TknType.AsKeyword)) type = TknType.AsKeyword;
                         else if (KeywordCmp(TknType.FnKeyword)) type = TknType.FnKeyword;
                         break;
@@ -335,10 +336,12 @@ namespace A7
                     {
                         if (KeywordCmp(TknType.AndKeyword)) type = TknType.AndKeyword;
                         else if (KeywordCmp(TknType.ForKeyword)) type = TknType.ForKeyword;
-                        else if (KeywordCmp(TknType.IntKeyword)) type = TknType.IntKeyword;
+                        else if (KeywordCmp(TknType.NewKeyword)) type = TknType.NewKeyword;
+                        else if (KeywordCmp(TknType.NilLiteral)) type = TknType.NilLiteral;
                         else if (KeywordCmp(TknType.RetKeyword)) type = TknType.RetKeyword;
                         else if (KeywordCmp(TknType.PubKeyword)) type = TknType.PubKeyword;
                         else if (KeywordCmp(TknType.RefKeyword)) type = TknType.RefKeyword;
+                        else if (KeywordCmp(TknType.IntKeyword)) type = TknType.IntKeyword;
                         else if (KeywordCmp(TknType.FltKeyword)) type = TknType.FltKeyword;
                         break;
                     }
@@ -349,6 +352,7 @@ namespace A7
                         else if (KeywordCmp(TknType.CharKeyword)) type = TknType.CharKeyword;
                         else if (KeywordCmp(TknType.EnumKeyword)) type = TknType.EnumKeyword;
                         else if (KeywordCmp(TknType.FallKeyword)) type = TknType.FallKeyword;
+                        else if (KeywordCmp(TknType.TrueLiteralKeyword)) type = TknType.TrueLiteralKeyword;
                         else if (KeywordCmp(TknType.UIntKeyword)) type = TknType.UIntKeyword;
                         break;
                     }
@@ -356,6 +360,7 @@ namespace A7
                     {
                         if (KeywordCmp(TknType.BreakKeyword)) type = TknType.BreakKeyword;
                         else if (KeywordCmp(TknType.MatchKeyword)) type = TknType.MatchKeyword;
+                        else if (KeywordCmp(TknType.FalseLiteralKeyword)) type = TknType.FalseLiteralKeyword;
                         break;
                     }
                 case 6:

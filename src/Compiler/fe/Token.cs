@@ -11,13 +11,16 @@ namespace A7
                 case TknType.IfKeyword: return "if";
                 case TknType.FnKeyword: return "fn";
                 case TknType.AsKeyword: return "as";
+                case TknType.OrKeyword: return "or";
                 // NOTE: 3 chars
                 case TknType.AndKeyword: return "and";
                 case TknType.ForKeyword: return "for";
-                case TknType.IntKeyword: return "int";
                 case TknType.RefKeyword: return "ref";
                 case TknType.RetKeyword: return "ret";
                 case TknType.PubKeyword: return "pub";
+                case TknType.NewKeyword: return "new";
+                case TknType.NilLiteral: return "nil";
+                case TknType.IntKeyword: return "int";
                 case TknType.FltKeyword: return "flt";
                 // NOTE: 4 chars
                 case TknType.ElseKeyword: return "else";
@@ -26,9 +29,11 @@ namespace A7
                 case TknType.EnumKeyword: return "enum";
                 case TknType.FallKeyword: return "fall";
                 case TknType.UIntKeyword: return "uint";
+                case TknType.TrueLiteralKeyword: return "true";
                 // NOTE: 5 chars
                 case TknType.BreakKeyword: return "break";
                 case TknType.MatchKeyword: return "match";
+                case TknType.FalseLiteralKeyword: return "false";
                 // NOTE: 6 chars
                 case TknType.DeleteKeyword: return "delete";
                 case TknType.ImportKeyword: return "import";
