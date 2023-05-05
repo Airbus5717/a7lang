@@ -2,13 +2,16 @@ namespace A7
 {
     public class Lexer
     {
-        public List<Token> m_tokens;
-        public int m_index, m_length, m_line;
-        public readonly string m_file, filename;
-        public ErrKind m_error;
+        private List<Token> m_tokens;
+        private int m_index, m_length, m_line;
+        private ErrKind m_error;
+        public string m_file { get; }
+        public string filename { get; }
+
+        // NOTE: These are not used for now
         // save state variables
         // for restoring state in error flow
-        public int save_index, save_length, save_line;
+        // private int save_index, save_length, save_line;
 
         public Lexer(string filename, ref string file)
         {
@@ -478,5 +481,11 @@ namespace A7
             return Status.Success;
         }
 
+
+        // Other "useless" methods
+        public Token[] GetTokens() { return m_tokens.ToArray(); }
+        public int GetIndex() { return m_index; }
+        public int GetLine() { return m_line; }
+        public ErrKind GetErr() { return m_error; }
     }
 }

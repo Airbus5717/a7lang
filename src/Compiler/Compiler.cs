@@ -41,7 +41,7 @@ namespace A7
             // Console.WriteLine("Tokens count: " + (lexer.m_tokens.Count-5));
 
             Console.WriteLine("File:\n {0}", myFile.m_item);
-            foreach (var i in lexer.m_tokens)
+            foreach (var i in lexer.GetTokens())
             {
                 if (i.type != TknType.EOT)
                     Console.WriteLine("[Token]: idx: {0}, type: {1}", i.index, i.type);

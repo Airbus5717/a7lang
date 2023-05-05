@@ -50,18 +50,18 @@ public class Err
     public static void LexerErrMsg(Lexer l)
     {
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.Write("> File: {0}:{1}:", l.filename, l.m_line);
+        Console.Write("> File: {0}:{1}:", l.filename, l.GetLine());
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write(" error: ");
         Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine(l.m_error);
+        Console.WriteLine(l.GetErr());
         Console.ResetColor();
-        Console.WriteLine(" {0} | line src code", l.m_line);
+        Console.WriteLine(" {0} | line src code", l.GetLine());
         Console.WriteLine(" 2 | "); // TODO: proper identing
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write("> Advice: ");
         Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine("{0}", GetErrString(l.m_error));
+        Console.WriteLine("{0}", GetErrString(l.GetErr()));
         Console.ResetColor();
         PrintStage(Stage.LEXER);
     }

@@ -11,13 +11,13 @@ namespace A7TestLexer
             A7.Lexer lex = new A7.Lexer("test", ref s);
             var st = lex.Lex();
             Assert.Equal(Status.Done, st);
-            Assert.Equal(TokensCountTest(4), lex.m_tokens.Count);
+            Assert.Equal(TokensCountTest(4), lex.GetTokens().Count());
 
             // didnt convert to loop due to EOT type tokens
-            Assert.Equal(A7.TknType.IntegerLiteral, lex.m_tokens[0].type);
-            Assert.Equal(A7.TknType.IntegerLiteral, lex.m_tokens[1].type);
-            Assert.Equal(A7.TknType.IntegerLiteral, lex.m_tokens[2].type);
-            Assert.Equal(A7.TknType.IntegerLiteral, lex.m_tokens[3].type);
+            Assert.Equal(A7.TknType.IntegerLiteral, lex.GetTokens()[0].type);
+            Assert.Equal(A7.TknType.IntegerLiteral, lex.GetTokens()[1].type);
+            Assert.Equal(A7.TknType.IntegerLiteral, lex.GetTokens()[2].type);
+            Assert.Equal(A7.TknType.IntegerLiteral, lex.GetTokens()[3].type);
         }
 
 
