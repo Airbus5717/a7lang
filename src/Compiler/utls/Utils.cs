@@ -82,14 +82,14 @@ public class Utils
             }
 
             // add padding nul chars
-            return new Result<string>(prepareStrForParsing(s));
+            return new Result<string>(PrepareStrForParsing(s));
         }
 
         LogErr("File [" + path + "] not found");
         return new Result<string>("", Res.Err);
     }
 
-    public static string prepareStrForParsing(string s)
+    public static string PrepareStrForParsing(string s)
     {
         // add newline + '\0' s
         char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
@@ -102,11 +102,11 @@ public class Utils
         => Environment.Exit(x);
 
 
-    public static void assert(bool expr)
+    public static void Assert(bool expr)
         => Debug.Assert(expr);
 
 
-    public static void TODO(string text,
+    public static void Todo(string text,
             [CallerFilePath] string file = "",
             [CallerMemberName] string member = "",
             [CallerLineNumber] int line = 0)

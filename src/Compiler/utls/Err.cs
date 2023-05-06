@@ -15,6 +15,7 @@ public enum Stage
     READ_FILE,
     LEXER,
     PARSER,
+    TYPE_CHECK,
 }
 
 
@@ -30,7 +31,7 @@ public class Err
             case ErrKind.NUM_TOO_LONG: return "Number literal is too long";
             default: break;
         }
-        Utils.TODO("Add an Error string for " + kind.ToString());
+        Utils.Todo("Add an Error string for " + kind.ToString());
         return "";
     }
 
@@ -41,9 +42,10 @@ public class Err
             case Stage.READ_FILE: return "READ FILE";
             case Stage.LEXER: return "LEXER";
             case Stage.PARSER: return "PARSER";
+            case Stage.TYPE_CHECK: return "TYPE CHECK";
             default: break;
         }
-        Utils.TODO("Add an Stage string for " + stage.ToString());
+        Utils.Todo("Add an Stage string for " + stage.ToString());
         return "";
     }
 
@@ -56,7 +58,7 @@ public class Err
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine(l.GetErr());
         Console.ResetColor();
-        Console.WriteLine(" {0} | line src code", l.GetLine());
+        Console.WriteLine(" {0} | {1}", l.GetLine(), l.m_file.Substring(l.GetIndex(), l.GetIndex()+l.GetLength()));
         Console.WriteLine(" 2 | "); // TODO: proper identing
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write("> Advice: ");

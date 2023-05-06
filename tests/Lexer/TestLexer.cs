@@ -7,7 +7,7 @@ namespace A7TestLexer
         [Fact]
         public void TestDigitNumber()
         {
-            string s = Utils.prepareStrForParsing("12 12 0xabc 0b10101");
+            string s = Utils.PrepareStrForParsing("12 12 0xabc 0b10101");
             A7.Lexer lex = new A7.Lexer("test", ref s);
             var st = lex.Lex();
             Assert.Equal(Status.Done, st);

@@ -5,13 +5,13 @@ namespace A7
         private List<Token> m_tokens;
         private int m_index, m_length, m_line;
         private ErrKind m_error;
+
         public string m_file { get; }
         public string filename { get; }
 
-        // NOTE: These are not used for now
         // save state variables
         // for restoring state in error flow
-        // private int save_index, save_length, save_line;
+        private int save_index, save_length, save_line;
 
         public Lexer(string filename, ref string file)
         {
@@ -38,6 +38,7 @@ namespace A7
 
             if (s == Status.Failure)
             {
+                RestoreState();
                 Err.LexerErrMsg(this);
             }
             return s;
@@ -46,7 +47,7 @@ namespace A7
         Status LexDirector()
         {
             char c = CurrentChar(), p = PeekChar();
-
+            SaveState();
             m_length = 0; // reset length
 
             SkipWhitespace();
@@ -234,13 +235,14 @@ namespace A7
                 {
                     case 'x': return LexHexIntLiteral();
                     case 'b': return LexBinaryIntLiteral();
+                    // case 'o': return LexOctalIntLiteral();
                     default: break;
                 }
             }
 
             bool reached_dot = false;
             AdvanceWithLength();
-            while (Char.IsAsciiDigit(CurrentChar()) || CurrentChar() == '.')
+            while (Char.IsAsciiDigit(CurrentChar()) || CurrentChar() == '.' || CurrentChar() == '_')
             {
                 AdvanceWithLength();
                 if (CurrentChar() == '.')
@@ -266,7 +268,7 @@ namespace A7
             AdvanceWithLength(); // '0'
             AdvanceWithLength(); // 'x'
 
-            while (Char.IsAsciiHexDigit(CurrentChar()))
+            while (Char.IsAsciiHexDigit(CurrentChar()) || CurrentChar() == '_')
             {
                 AdvanceWithLength();
             }
@@ -288,7 +290,7 @@ namespace A7
             AdvanceWithLength(); // '0'
             AdvanceWithLength(); // 'b'
 
-            for (char c = CurrentChar(); c == '0' || c == '1'; c = CurrentChar())
+            for (char c = CurrentChar(); c == '0' || c == '1' || c == '_'; c = CurrentChar())
                 AdvanceWithLength();
 
 
@@ -305,7 +307,7 @@ namespace A7
 
         Status LexBuiltin()
         {
-            Utils.TODO("Lex Builtin ");
+            Utils.Todo("Lex Builtin ");
             return Status.Failure;
         }
 
@@ -383,7 +385,7 @@ namespace A7
 
             if (m_length > 0x80)
             {
-                Utils.TODO("Handle long Identifiers");
+                Utils.Todo("Handle long Identifiers");
                 return Status.Failure;
             }
 
@@ -392,14 +394,14 @@ namespace A7
 
         Status LexChar()
         {
-            Utils.TODO("Lex character literals");
+            Utils.Todo("Lex character literals");
             AdvanceWithLength(); RestoreIndex();
             return Status.Failure;
         }
 
         Status LexString()
         {
-            Utils.TODO("Lex string literals");
+            Utils.Todo("Lex string literals");
             Advance();
             m_error = ErrKind.STR_NOT_CLOSED;
             return Status.Failure;
@@ -408,7 +410,7 @@ namespace A7
         Status LexMultiLineComments()
         {
             // TODO: Fix the Bugs
-            Utils.TODO("implement Lex Multi line comments; Nested comments too");
+            Utils.Todo("implement Lex Multi line comments; Nested comments too");
             Advance(); // '/'
             Advance(); // '*'
             uint deepness = 1;
@@ -447,19 +449,19 @@ namespace A7
         void AdvanceWithLength() { ++m_index; ++m_length; }
 
         //* NOTE(5717): REMOVED THE NEED FOR RESTORE STATE
-        // void SaveState()
-        // {
-        //     save_index = m_index;
-        //     save_length = m_length;
-        //     save_line = m_line;
-        // }
+        void SaveState()
+        {
+            save_index = m_index;
+            save_length = m_length;
+            save_line = m_line;
+        }
 
-        // void RestoreState()
-        // {
-        //     m_index = save_index;
-        //     m_length = save_length;
-        //     m_line = save_line;
-        // }
+        void RestoreState()
+        {
+            m_index = save_index;
+            m_length = save_length;
+            m_line = save_line;
+        }
 
 
         void RestoreIndex()
@@ -482,7 +484,7 @@ namespace A7
         Status AddToken(TknType type)
         {
             m_tokens.Add(new Token(m_index, m_length, m_line, type));
-            m_index += m_length + 1;
+            m_index += (m_length + 1);
             return Status.Success;
         }
 
@@ -490,6 +492,7 @@ namespace A7
         // Other "useless" methods
         public Token[] GetTokens() { return m_tokens.ToArray(); }
         public int GetIndex() { return m_index; }
+        public int GetLength() { return m_length; }
         public int GetLine() { return m_line; }
         public ErrKind GetErr() { return m_error; }
     }
