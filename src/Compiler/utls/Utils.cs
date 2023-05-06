@@ -64,7 +64,7 @@ public class Utils
             string s = "";
             try
             {
-                //* Exception is considered a bad practice
+                // NOTE: Exceptions are considered a bad practice
                 s = File.ReadAllText(path);
             }
             catch (Exception e)

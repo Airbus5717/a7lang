@@ -11,7 +11,7 @@ namespace A7
 
         // save state variables
         // for restoring state in error flow
-        private int save_index, save_length, save_line;
+        private int save_index, save_line;
 
         public Lexer(string filename, ref string file)
         {
@@ -67,9 +67,10 @@ namespace A7
             if (c == '@')
                 return LexBuiltin();
 
+            m_length++;
             switch (c)
             {
-                case ';': return AddToken(TknType.SemiColon);
+                case ';': return AddToken(TknType.Terminator);
                 case '{': return AddToken(TknType.OpenCurly);
                 case '}': return AddToken(TknType.CloseCurly);
                 case '(': return AddToken(TknType.OpenParen);
@@ -207,9 +208,10 @@ namespace A7
                         return AddToken(TknType.Not);
                     }
                 case ' ':
-                case '\n':
+                case '\t':
                 case '\r':
-                    // SkipWhitespace() will deal with it
+                case '\n':
+                    // NOTE: SkipWhitespace() will deal with it, next iteration
                     return Status.Success;
                 case char.MinValue: // '\0'
                     {
@@ -307,7 +309,7 @@ namespace A7
 
         Status LexBuiltin()
         {
-            Utils.Todo("Lex Builtin ");
+            Utils.Todo("Lex Builtin implementation");
             return Status.Failure;
         }
 
@@ -354,7 +356,7 @@ namespace A7
                         else if (KeywordCmp(TknType.CharKeyword)) type = TknType.CharKeyword;
                         else if (KeywordCmp(TknType.EnumKeyword)) type = TknType.EnumKeyword;
                         else if (KeywordCmp(TknType.FallKeyword)) type = TknType.FallKeyword;
-                        else if (KeywordCmp(TknType.TrueLiteralKeyword)) type = TknType.TrueLiteralKeyword;
+                        else if (KeywordCmp(TknType.TrueLiteral)) type = TknType.TrueLiteral;
                         else if (KeywordCmp(TknType.UIntKeyword)) type = TknType.UIntKeyword;
                         break;
                     }
@@ -362,7 +364,8 @@ namespace A7
                     {
                         if (KeywordCmp(TknType.BreakKeyword)) type = TknType.BreakKeyword;
                         else if (KeywordCmp(TknType.MatchKeyword)) type = TknType.MatchKeyword;
-                        else if (KeywordCmp(TknType.FalseLiteralKeyword)) type = TknType.FalseLiteralKeyword;
+                        else if (KeywordCmp(TknType.DeferKeyword)) type = TknType.DeferKeyword;
+                        else if (KeywordCmp(TknType.FalseLiteral)) type = TknType.FalseLiteral;
                         break;
                     }
                 case 6:
@@ -407,39 +410,40 @@ namespace A7
             return Status.Failure;
         }
 
-        Status LexMultiLineComments()
-        {
-            // TODO: Fix the Bugs
-            Utils.Todo("implement Lex Multi line comments; Nested comments too");
-            Advance(); // '/'
-            Advance(); // '*'
-            uint deepness = 1;
-            char c = CurrentChar(), p = PeekChar();
-            while (true)
-            {
-                if (c == '/' && p == '*') { deepness++; Advance(); Advance(); }
-                if (c == '*' && p == '/') { deepness--; Advance(); Advance(); }
-                // update
-                Advance();
-                c = p;
-                p = PeekChar();
-                if (deepness == 0) break;
-                if (p == char.MinValue) break;
-            }
-            Advance();
-            return deepness == 0 ? Status.Success : Status.Failure;
-        }
+        // Status LexMultiLineComments()
+        // {
+        //     // TODO: Fix the Bugs
+        //     Utils.Todo("implement Lex Multi line comments; Nested comments too");
+        //     Advance(); // '/'
+        //     Advance(); // '*'
+        //     uint deepness = 1;
+        //     char c = CurrentChar(), p = PeekChar();
+        //     while (true)
+        //     {
+        //         if (c == '/' && p == '*') { deepness++; Advance(); Advance(); }
+        //         if (c == '*' && p == '/') { deepness--; Advance(); Advance(); }
+        //         // update
+        //         Advance();
+        //         c = p;
+        //         p = PeekChar();
+        //         if (deepness == 0) break;
+        //         if (p == char.MinValue) break;
+        //     }
+        //     Advance();
+        //     return deepness == 0 ? Status.Success : Status.Failure;
+        // }
 
         void SkipWhitespace()
         {
             while (true)
             {
                 char c = CurrentChar();
-                if (c == ' ') { Advance(); }
+                if (c == ' ' || c == '\t') { Advance(); }
                 else if (c == '\n')
                 {
-                    Advance();
                     m_line++;
+                    AddToken(TknType.Terminator);
+                    Advance();
                 }
                 else { break; }
             }
@@ -448,21 +452,19 @@ namespace A7
         void Advance() { ++m_index; }
         void AdvanceWithLength() { ++m_index; ++m_length; }
 
-        //* NOTE(5717): REMOVED THE NEED FOR RESTORE STATE
+        //* FOR ERROR HANDLING
         void SaveState()
         {
             save_index = m_index;
-            save_length = m_length;
             save_line = m_line;
         }
 
+        //* FOR ERROR HANDLING
         void RestoreState()
         {
             m_index = save_index;
-            m_length = save_length;
             m_line = save_line;
         }
-
 
         void RestoreIndex()
         {
@@ -484,13 +486,13 @@ namespace A7
         Status AddToken(TknType type)
         {
             m_tokens.Add(new Token(m_index, m_length, m_line, type));
-            m_index += (m_length + 1);
+            m_index += (m_length); // ADD one to go to the next
             return Status.Success;
         }
 
 
         // Other "useless" methods
-        public Token[] GetTokens() { return m_tokens.ToArray(); }
+        public Token[] GetTokens() { return m_tokens.ToArray<Token>(); }
         public int GetIndex() { return m_index; }
         public int GetLength() { return m_length; }
         public int GetLine() { return m_line; }

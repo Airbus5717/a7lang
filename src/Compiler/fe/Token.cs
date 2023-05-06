@@ -29,11 +29,12 @@ namespace A7
                 case TknType.EnumKeyword: return "enum";
                 case TknType.FallKeyword: return "fall";
                 case TknType.UIntKeyword: return "uint";
-                case TknType.TrueLiteralKeyword: return "true";
+                case TknType.TrueLiteral: return "true";
                 // NOTE: 5 chars
                 case TknType.BreakKeyword: return "break";
                 case TknType.MatchKeyword: return "match";
-                case TknType.FalseLiteralKeyword: return "false";
+                case TknType.DeferKeyword: return "defer";
+                case TknType.FalseLiteral: return "false";
                 // NOTE: 6 chars
                 case TknType.DeleteKeyword: return "delete";
                 case TknType.ImportKeyword: return "import";
@@ -48,11 +49,13 @@ namespace A7
     }
 
 
-
-    public struct Token
+    /// NOTE: records are used generally for immutable state
+    public record Token
     {
-        public int index, length, line;
-        public TknType type;
+        public int index { get; }
+        public int length { get; }
+        public int line { get; }
+        public TknType type { get; }
 
 
         public Token(int index, int length, int line, TknType type)
@@ -81,10 +84,10 @@ namespace A7
         StringLiteral, // refer to strings
         CharLiteral, // refers to chars
         CharKeyword, // 'char'
-        TrueLiteralKeyword, // 'true'
-        FalseLiteralKeyword, // 'false'
+        TrueLiteral, // 'true'
+        FalseLiteral, // 'false'
         BoolKeyword, // 'bool'
-        SemiColon, // ;
+        Terminator, // ; | '\n'
         Colon, // :
         FnKeyword, // 'fn'
         PlusOperator, // +
@@ -129,6 +132,7 @@ namespace A7
         MultEqual, // *=
         DivEqual, // /=
         RecordKeyword, // 'record' basically struct
+        DeferKeyword, // 'defer' cleanup at end of scope
         VariantKeyword, // 'variant' basically tagged union
         RefKeyword, // 'ref' // TODO later
         NilLiteral, // `nil` basically null

@@ -58,8 +58,10 @@ public class Err
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine(l.GetErr());
         Console.ResetColor();
-        Console.WriteLine(" {0} | {1}", l.GetLine(), l.m_file.Substring(l.GetIndex(), l.GetIndex()+l.GetLength()));
-        Console.WriteLine(" 2 | "); // TODO: proper identing
+        string codeInline = l.m_file.Substring(l.GetIndex(), l.GetIndex() + l.GetLength());
+        // Utils.LogInfo("lex.idx:" + l.GetIndex() + ", len:" + l.GetLength());
+        Console.WriteLine(" {0} | {1}", l.GetLine(), codeInline);
+        Console.WriteLine("   | ");
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write("> Advice: ");
         Console.ForegroundColor = ConsoleColor.Blue;

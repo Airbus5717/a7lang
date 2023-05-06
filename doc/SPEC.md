@@ -9,6 +9,7 @@ which will compile to a subset of C and then use a C compiler to generate execut
 - Basic inferreable type system
 - C like language inspiration with modifications for modernization
 - prefer minimal typing
+- optional semicolon
 
 
 ## Maybe? features

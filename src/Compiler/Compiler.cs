@@ -18,8 +18,8 @@ namespace A7
         {
             /*
                 Compiling Stages
-                1. Read File -> File
-                2. Lex File -> Tokens
+                1. Read File -> File [DONE]
+                2. Lex File -> Tokens []
                 3. Parse Tokens -> Ast
                 4. Type Check -> Checked Ast
                 5. Optimize (optional) -> partially Optimized Ast
@@ -40,11 +40,11 @@ namespace A7
 
             // Console.WriteLine("Tokens count: " + (lexer.m_tokens.Count-5));
 
-            Console.WriteLine("File:\n {0}", myFile.m_item);
+            Console.WriteLine("File(len={0}):\n {1}", myFile.m_item.Count(), myFile.m_item);
             foreach (var i in lexer.GetTokens())
             {
                 if (i.type != TknType.EOT)
-                    Console.WriteLine("[Token]: idx: {0}, type: {1}", i.index, i.type);
+                    Console.WriteLine("[Token]: idx: {0}, len: {1}, type: {2}", i.index, i.length, i.type);
             }
 
             // TODO: STAGE: Parse Tokens
