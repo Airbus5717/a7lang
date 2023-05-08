@@ -94,8 +94,13 @@ public class Utils
         // add newline + '\0' s
         char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
         Array.Fill(padding, char.MinValue);
-        s = s + '\n' + new string(padding);
-        return s;
+        /*
+         * the string gets appended with NULL_TERMINATORS_COUNT_FILE_READ count of zero value char 
+         * prepended with a newline char
+         * to simplify the lexical analysis
+         * */
+        string res = s + '\n' + new string(padding);
+        return res;
     }
 
     public static void Exit(int x)

@@ -71,7 +71,7 @@ namespace A7
     public enum TknType : byte
     {
         Identifier, // ids
-        BuiltinFunc, // @id
+        BuiltinId, // @id
         AsKeyword, // 'as'
         DeleteKeyword, // 'del'
         NewKeyword, // 'new'

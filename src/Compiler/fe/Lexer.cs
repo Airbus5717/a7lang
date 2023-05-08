@@ -2,6 +2,15 @@ namespace A7
 {
     public class Lexer
     {
+
+        // NOTE: These are not the final length check
+        // but these are used just to filter out
+        private static int MAX_LENGTH_STRING = int.MaxValue >> 2;
+        private static int MAX_LENGTH_INT_DECIMAL = 30;
+        private static int MAX_LENGTH_INT_BINARY = 70;
+        private static int MAX_LENGTH_INT_HEX = 20;
+        private static int MAX_LENGTH_IDENTIFIER = 150;
+
         private List<Token> m_tokens;
         private int m_index, m_length, m_line;
         private ErrKind m_error;
@@ -67,7 +76,7 @@ namespace A7
             if (c == '@')
                 return LexBuiltin();
 
-            m_length++;
+            m_length++; // to simplify the code
             switch (c)
             {
                 case ';': return AddToken(TknType.Terminator);
@@ -256,7 +265,7 @@ namespace A7
 
 
             // TODO: handle lex large numerics
-            if (m_length > 0x80)
+            if (m_length > MAX_LENGTH_INT_DECIMAL)
             {
                 m_error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
@@ -277,7 +286,7 @@ namespace A7
 
 
             // TODO: handle lex large numerics
-            if (m_length > 20)
+            if (m_length > MAX_LENGTH_INT_HEX)
             {
                 m_error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
@@ -297,7 +306,7 @@ namespace A7
 
 
             // TODO: handle lex large numerics
-            if (m_length > 66)
+            if (m_length > MAX_LENGTH_INT_BINARY)
             {
                 m_error = ErrKind.NUM_TOO_LONG;
                 return Status.Failure;
@@ -309,13 +318,26 @@ namespace A7
 
         Status LexBuiltin()
         {
-            Utils.Todo("Lex Builtin implementation");
-            return Status.Failure;
+            AdvanceWithLength(); // '@'
+
+            while (Char.IsAsciiLetter(CurrentChar()) || CurrentChar() == '_')
+            {
+                AdvanceWithLength();
+            }
+
+
+            if (m_length > MAX_LENGTH_IDENTIFIER)
+            {
+                Utils.Todo("Handle long builtin Identifiers");
+                return Status.Failure;
+            }
+            RestoreIndex();
+            return AddToken(TknType.BuiltinId);
         }
 
         Status LexIdentifier()
         {
-            AdvanceWithLength();
+            AdvanceWithLength(); // skip the first char
             while (Char.IsAsciiLetterOrDigit(CurrentChar()) || CurrentChar() == '_')
             {
                 AdvanceWithLength();
@@ -386,7 +408,7 @@ namespace A7
 
             }
 
-            if (m_length > 0x80)
+            if (m_length > MAX_LENGTH_IDENTIFIER)
             {
                 Utils.Todo("Handle long Identifiers");
                 return Status.Failure;
@@ -407,6 +429,12 @@ namespace A7
             Utils.Todo("Lex string literals");
             Advance();
             m_error = ErrKind.STR_NOT_CLOSED;
+
+            if (m_length > MAX_LENGTH_STRING)
+            {
+                Utils.Todo("Handle long string");
+                return Status.Failure;
+            }
             return Status.Failure;
         }
 
@@ -475,12 +503,16 @@ namespace A7
         char PeekChar() { return m_file[(m_index + 1)]; }
         char PastChar() { return m_file[(m_index - 1)]; }
         // is not end of file
-        bool IsNotEOF() { return (m_index < m_file.Length); }
+        bool IsNotEOF()
+        {
+            bool res = (CurrentChar() == '\0') || (m_index < m_file.Length);
+            return res;
+        }
 
         bool KeywordCmp(TknType type)
         {
-            return m_file.Substring(m_index, m_length) ==
-                TokenMethods.GetKeywordStr(type);
+            bool res = m_file.Substring(m_index, m_length) == TokenMethods.GetKeywordStr(type);
+            return res;
         }
 
         Status AddToken(TknType type)
