@@ -6,7 +6,7 @@
     <RootNamespace>A7</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <StartupObject>A7CLI.Program</StartupObject>
+    <StartupObject>A7.CLI.Program</StartupObject>
     <IsPackable>false</IsPackable>
     <PublishAot>true</PublishAot>
 
