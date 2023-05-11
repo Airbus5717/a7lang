@@ -1,12 +1,10 @@
 
-namespace A7CLI
+namespace A7.CLI;
+class Program
 {
-    class Program
-    {
 
-        static void Main(string[] args)
-        {
-            A7.Compiler.compile(new A7.CompileOptions("main.a7"));
-        }
+    static void Main(string[] args)
+    {
+        A7.Compiler.compile(new A7.CompileOptions("main.a7"));
     }
 }

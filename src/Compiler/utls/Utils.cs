@@ -1,3 +1,5 @@
+namespace A7.Utils;
+
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 
@@ -26,7 +28,7 @@ public class Result<T>
     }
 }
 
-public class Utils
+public class Utilities
 {
     // TODO: use a stdlib logger
     private static readonly string[] LOG_STRINGS = {
@@ -95,7 +97,7 @@ public class Utils
         char[] padding = new char[NULL_TERMINATORS_COUNT_FILE_READ];
         Array.Fill(padding, char.MinValue);
         /*
-         * the string gets appended with NULL_TERMINATORS_COUNT_FILE_READ count of zero value char 
+         * the string gets appended with NULL_TERMINATORS_COUNT_FILE_READ count of zero value char
          * prepended with a newline char
          * to simplify the lexical analysis
          * */

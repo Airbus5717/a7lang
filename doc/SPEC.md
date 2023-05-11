@@ -9,7 +9,7 @@ which will compile to a subset of C and then use a C compiler to generate execut
 - Basic inferreable type system
 - C like language inspiration with modifications for modernization
 - prefer minimal typing
-- optional semicolon
+- Semicolons are optional
 
 
 ## Maybe? features
@@ -116,10 +116,10 @@ fn add(x: int, y: int) int { ret x + y; }
 
 ### If stmts
 
-```py
+```cpp
 if (cond) {
 
-} elif (cond2) {
+} else if (cond2) {
 
 } else {
 
@@ -145,9 +145,7 @@ for (i, v; arr) {
 }
 ```
 
-### Object
-no methods, sorry
-u gotta create them manually
+### Structs
 ```
 record Vec2 {
     x: uint;

@@ -1,4 +1,6 @@
-using A7;
+namespace A7.Utils;
+
+using A7.Frontend;
 
 public enum ErrKind
 {
@@ -31,7 +33,7 @@ public class Err
             case ErrKind.NUM_TOO_LONG: return "Number literal is too long";
             default: break;
         }
-        Utils.Todo("Add an Error string for " + kind.ToString());
+        Utilities.Todo("Add an Error string for " + kind.ToString());
         return "";
     }
 
@@ -45,7 +47,7 @@ public class Err
             case Stage.TYPE_CHECK: return "TYPE CHECK";
             default: break;
         }
-        Utils.Todo("Add an Stage string for " + stage.ToString());
+        Utilities.Todo("Add an Stage string for " + stage.ToString());
         return "";
     }
 
@@ -59,7 +61,7 @@ public class Err
         Console.WriteLine(l.GetErr());
         Console.ResetColor();
         string codeInline = l.m_file.Substring(l.GetIndex(), l.GetIndex() + l.GetLength());
-        // Utils.LogInfo("lex.idx:" + l.GetIndex() + ", len:" + l.GetLength());
+        // Utilities.LogInfo("lex.idx:" + l.GetIndex() + ", len:" + l.GetLength());
         Console.WriteLine(" {0} | {1}", l.GetLine(), codeInline);
         Console.WriteLine("   | ");
         Console.ForegroundColor = ConsoleColor.Red;
@@ -72,6 +74,6 @@ public class Err
 
     public static void PrintStage(Stage s)
     {
-        Utils.Log(ConsoleColor.Magenta, "[STAGE]: ", GetStageString(s));
+        Utilities.Log(ConsoleColor.Magenta, "[STAGE]: ", GetStageString(s));
     }
 }
