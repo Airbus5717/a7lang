@@ -38,7 +38,7 @@ class Compiler
         var lexer = new Lexer(opts.path, ref myFile.m_item);
         if (lexer.Lex() == Status.Failure)
             return Status.Failure;
-
+#if DEBUG
         // Console.WriteLine("Tokens count: " + (lexer.m_tokens.Count-5));
         if (myFile.m_item.LongCount() > 0x1000)
         {
@@ -53,6 +53,7 @@ class Compiler
                     Console.WriteLine("[Token]: idx: {0}, len: {1}, type: {2}", i.index, i.length, i.type);
             }
         }
+#endif
         // TODO: STAGE: Parse Tokens
         // TODO: STAGE: Type Check
         // TODO: STAGE: Optimize

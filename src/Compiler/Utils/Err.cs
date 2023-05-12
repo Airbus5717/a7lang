@@ -8,7 +8,8 @@ public enum ErrKind
     UNKNOWN,
     STR_NOT_CLOSED,
     NUM_TOO_LONG,
-
+    NOT_VALID_ESC_CHAR,
+    INVALID_CHAR_LITERAL,
     // PARSER
 }
 

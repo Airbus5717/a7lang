@@ -1,9 +1,9 @@
 namespace A7.Frontend;
 
 using A7.Utils;
+
 public class Lexer
 {
-
     // NOTE: These are not the final length check
     // but these are used just to filter out
     private static int MAX_LENGTH_STRING { get; } = int.MaxValue >> 2;
@@ -56,7 +56,7 @@ public class Lexer
 
     Status LexDirector()
     {
-        char c = CurrentChar(), p = PeekChar();
+        char c = CurrentChar(), p = NextChar();
         SaveState();
         SkipWhitespace();
 
@@ -239,7 +239,7 @@ public class Lexer
 
     Status LexNumeric()
     {
-        char c = CurrentChar(), p = PeekChar();
+        char c = CurrentChar(), p = NextChar();
 
         if (c == '0')
         {
@@ -420,23 +420,75 @@ public class Lexer
 
     Status LexChar()
     {
-        Utilities.Todo("Lex character literals");
-        AdvanceWithLength(); RestoreIndex();
+        AdvanceWithLength();
+        if (CurrentChar() != '\\' && NextChar() == '\'')
+        {
+            AdvanceWithLength();
+            AdvanceWithLength();
+            RestoreIndex();
+            return AddToken(TknType.CharLiteral);
+        }
+        else if (CurrentChar() == '\\')
+        {
+            AdvanceWithLength();
+            switch (CurrentChar())
+            {
+                case 'n':
+                case 't':
+                case 'r':
+                case '\\':
+                case '\'':
+                    { AdvanceWithLength(); break; }
+                default:
+                    m_error = ErrKind.NOT_VALID_ESC_CHAR;
+                    return Status.Failure;
+            }
+            if (CurrentChar() == '\'')
+            {
+                AdvanceWithLength();
+                RestoreIndex();
+                return AddToken(TknType.CharLiteral);
+            }
+        }
+        m_error = ErrKind.INVALID_CHAR_LITERAL;
         return Status.Failure;
     }
 
     Status LexString()
     {
-        Utilities.Todo("Lex string literals");
-        Advance();
-        m_error = ErrKind.STR_NOT_CLOSED;
+        AdvanceWithLength();
+        while (true)
+        {
+            char c = CurrentChar();
+
+            if (c == '"')
+            {
+                if (PrevChar() == '\\')
+                {
+                    AdvanceWithLength();
+                    continue;
+                }
+                break;
+            }
+
+            if (c == char.MinValue /* '\0' */)
+            {
+                m_error = ErrKind.STR_NOT_CLOSED;
+                return Status.Failure;
+            }
+
+            AdvanceWithLength();
+        }
+        AdvanceWithLength(); // '"'
 
         if (m_length > MAX_LENGTH_STRING)
         {
             Utilities.Todo("Handle long string");
             return Status.Failure;
         }
-        return Status.Failure;
+
+        RestoreIndex();
+        return AddToken(TknType.StringLiteral);
     }
 
     // Status LexMultiLineComments()
@@ -502,8 +554,8 @@ public class Lexer
     }
 
     char CurrentChar() { return m_file[m_index]; }
-    char PeekChar() { return m_file[(m_index + 1)]; }
-    char PastChar() { return m_file[(m_index - 1)]; }
+    char NextChar() { return m_file[(m_index + 1)]; }
+    char PrevChar() { return m_file[(m_index - 1)]; }
     // is not end of file
     bool IsNotEOF()
     {

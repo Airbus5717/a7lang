@@ -8,6 +8,8 @@ namespace A7TestLexer
 {
     public class TestLexer
     {
+
+        // TODO: Add tests for each Token Type
         [Fact]
         public void TestDigitNumber()
         {
