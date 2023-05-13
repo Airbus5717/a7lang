@@ -78,7 +78,6 @@ public class Utilities
             //! NOTE: Very important check
             if (s.Length >= (int.MaxValue >> 2))
             {
-
                 LogErr("Too Large file: " + path);
                 return new Result<string>(s, Res.Err);
             }
@@ -123,6 +122,7 @@ public class Utilities
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine("file: {0}, line: {1}, method: {2}", file, line, member);
         Console.ResetColor();
+        PrintStackTrace();
         Exit(1);
     }
 

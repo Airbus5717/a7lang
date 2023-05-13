@@ -47,10 +47,10 @@ class Compiler
         else
         {
             Console.WriteLine("File(len={0})\n ", myFile.m_item.LongCount());
-            foreach (var i in lexer.GetTokens())
+            foreach (Token i in lexer.GetTokens())
             {
-                if (i.type != TknType.EOT)
-                    Console.WriteLine("[Token]: idx: {0}, len: {1}, type: {2}", i.index, i.length, i.type);
+                Console.WriteLine("[Token]: idx: {0}, len: {1}, type: {2}", i.index, i.length, i.type);
+                if (i.type == TknType.EOT) break;
             }
         }
 #endif

@@ -4,48 +4,39 @@ using A7.Utils;
 
 public static class TokenMethods
 {
-    public static string GetKeywordStr(TknType type)
+    public static Dictionary<string, TknType> GetKeywordMap()
     {
-        switch (type)
-        {
-            // NOTE: 2 chars
-            case TknType.IfKeyword: return "if";
-            case TknType.FnKeyword: return "fn";
-            case TknType.AsKeyword: return "as";
-            case TknType.OrKeyword: return "or";
-            // NOTE: 3 chars
-            case TknType.AndKeyword: return "and";
-            case TknType.ForKeyword: return "for";
-            case TknType.RefKeyword: return "ref";
-            case TknType.RetKeyword: return "ret";
-            case TknType.PubKeyword: return "pub";
-            case TknType.NewKeyword: return "new";
-            case TknType.NilLiteral: return "nil";
-            case TknType.IntKeyword: return "int";
-            case TknType.FltKeyword: return "flt";
-            // NOTE: 4 chars
-            case TknType.ElseKeyword: return "else";
-            case TknType.BoolKeyword: return "bool";
-            case TknType.CharKeyword: return "char";
-            case TknType.EnumKeyword: return "enum";
-            case TknType.FallKeyword: return "fall";
-            case TknType.UIntKeyword: return "uint";
-            case TknType.TrueLiteral: return "true";
-            // NOTE: 5 chars
-            case TknType.BreakKeyword: return "break";
-            case TknType.MatchKeyword: return "match";
-            case TknType.DeferKeyword: return "defer";
-            case TknType.FalseLiteral: return "false";
-            // NOTE: 6 chars
-            case TknType.DeleteKeyword: return "delete";
-            case TknType.ImportKeyword: return "import";
-            case TknType.RecordKeyword: return "record";
-            // NOTE: 7 chars
-            case TknType.ForEachKeyword: return "foreach";
-            case TknType.VariantKeyword: return "variant";
-        }
-        Utilities.UNREACHABLE();
-        return "";
+        var dict = new Dictionary<string, TknType>(30);
+        dict.Add("if", TknType.IfKeyword);
+        dict.Add("fn", TknType.FnKeyword);
+        dict.Add("as", TknType.AsKeyword);
+        dict.Add("or", TknType.OrKeyword);
+        dict.Add("and", TknType.AndKeyword);
+        dict.Add("for", TknType.ForKeyword);
+        dict.Add("ref", TknType.RefKeyword);
+        dict.Add("ret", TknType.RetKeyword);
+        dict.Add("pub", TknType.PubKeyword);
+        dict.Add("new", TknType.NewKeyword);
+        dict.Add("nil", TknType.NilLiteral);
+        dict.Add("int", TknType.IntKeyword);
+        dict.Add("flt", TknType.FltKeyword);
+        dict.Add("else", TknType.ElseKeyword);
+        dict.Add("bool", TknType.BoolKeyword);
+        dict.Add("char", TknType.CharKeyword);
+        dict.Add("enum", TknType.EnumKeyword);
+        dict.Add("fall", TknType.FallKeyword);
+        dict.Add("uint", TknType.UIntKeyword);
+        dict.Add("true", TknType.TrueLiteral);
+        dict.Add("break", TknType.BreakKeyword);
+        dict.Add("match", TknType.MatchKeyword);
+        dict.Add("defer", TknType.DeferKeyword);
+        dict.Add("false", TknType.FalseLiteral);
+        dict.Add("delete", TknType.DeleteKeyword);
+        dict.Add("import", TknType.ImportKeyword);
+        dict.Add("record", TknType.RecordKeyword);
+        dict.Add("foreach", TknType.ForEachKeyword);
+        dict.Add("variant", TknType.VariantKeyword);
+        return dict;
     }
 }
 

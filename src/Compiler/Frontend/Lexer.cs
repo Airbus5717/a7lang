@@ -2,6 +2,13 @@ namespace A7.Frontend;
 
 using A7.Utils;
 
+
+/*
+TODO List:
+    - Multiline comments
+    - Multiline strings
+*/
+
 public class Lexer
 {
     // NOTE: These are not the final length check
@@ -22,15 +29,18 @@ public class Lexer
     // save state variables
     // for restoring state in error flow
     private int save_index, save_line;
+    private int KEYWORD_COUNT { get; } = 29;
+    private Dictionary<string, TknType> keyword_map;
 
     public Lexer(string filename, ref string file)
     {
         this.m_file = file;
         this.filename = filename;
-        this.m_tokens = new List<Token>(100);
+        this.m_tokens = new List<Token>(file.Length / 4);
         this.m_line = 1;
         this.m_index = 0;
         this.m_error = ErrKind.UNKNOWN;
+        this.keyword_map = TokenMethods.GetKeywordMap();
     }
 
     // NOTE(5717): Lexer starting point
@@ -73,6 +83,8 @@ public class Lexer
         if (c == '\'')
             return LexChar();
 
+        if (c == '`')
+            Utilities.Todo("Implement multiline strings");
 
         if (c == '@')
             return LexBuiltin();
@@ -265,7 +277,6 @@ public class Lexer
         }
 
 
-        // TODO: handle lex large numerics
         if (m_length > MAX_LENGTH_INT_DECIMAL)
         {
             m_error = ErrKind.NUM_TOO_LONG;
@@ -286,7 +297,6 @@ public class Lexer
         }
 
 
-        // TODO: handle lex large numerics
         if (m_length > MAX_LENGTH_INT_HEX)
         {
             m_error = ErrKind.NUM_TOO_LONG;
@@ -306,7 +316,6 @@ public class Lexer
             AdvanceWithLength();
 
 
-        // TODO: handle lex large numerics
         if (m_length > MAX_LENGTH_INT_BINARY)
         {
             m_error = ErrKind.NUM_TOO_LONG;
@@ -329,7 +338,7 @@ public class Lexer
 
         if (m_length > MAX_LENGTH_IDENTIFIER)
         {
-            Utilities.Todo("Handle long builtin Identifiers");
+            m_error = ErrKind.BUILTIN_ID_TOO_LONG;
             return Status.Failure;
         }
         RestoreIndex();
@@ -346,72 +355,12 @@ public class Lexer
         // restore the index for comparing
         RestoreIndex();
 
-
-        TknType type = TknType.Identifier;
-        // TODO: optimize Keyword comparing (profile before optimizing)
-        switch (m_length)
-        {
-            case 2:
-                {
-                    if (KeywordCmp(TknType.IfKeyword)) type = TknType.IfKeyword;
-                    else if (KeywordCmp(TknType.OrKeyword)) type = TknType.OrKeyword;
-                    else if (KeywordCmp(TknType.AsKeyword)) type = TknType.AsKeyword;
-                    else if (KeywordCmp(TknType.FnKeyword)) type = TknType.FnKeyword;
-                    break;
-                }
-            case 3:
-                {
-                    if (KeywordCmp(TknType.AndKeyword)) type = TknType.AndKeyword;
-                    else if (KeywordCmp(TknType.ForKeyword)) type = TknType.ForKeyword;
-                    else if (KeywordCmp(TknType.NewKeyword)) type = TknType.NewKeyword;
-                    else if (KeywordCmp(TknType.NilLiteral)) type = TknType.NilLiteral;
-                    else if (KeywordCmp(TknType.RetKeyword)) type = TknType.RetKeyword;
-                    else if (KeywordCmp(TknType.PubKeyword)) type = TknType.PubKeyword;
-                    else if (KeywordCmp(TknType.RefKeyword)) type = TknType.RefKeyword;
-                    else if (KeywordCmp(TknType.IntKeyword)) type = TknType.IntKeyword;
-                    else if (KeywordCmp(TknType.FltKeyword)) type = TknType.FltKeyword;
-                    break;
-                }
-            case 4:
-                {
-                    if (KeywordCmp(TknType.ElseKeyword)) type = TknType.ElseKeyword;
-                    else if (KeywordCmp(TknType.BoolKeyword)) type = TknType.BoolKeyword;
-                    else if (KeywordCmp(TknType.CharKeyword)) type = TknType.CharKeyword;
-                    else if (KeywordCmp(TknType.EnumKeyword)) type = TknType.EnumKeyword;
-                    else if (KeywordCmp(TknType.FallKeyword)) type = TknType.FallKeyword;
-                    else if (KeywordCmp(TknType.TrueLiteral)) type = TknType.TrueLiteral;
-                    else if (KeywordCmp(TknType.UIntKeyword)) type = TknType.UIntKeyword;
-                    break;
-                }
-            case 5:
-                {
-                    if (KeywordCmp(TknType.BreakKeyword)) type = TknType.BreakKeyword;
-                    else if (KeywordCmp(TknType.MatchKeyword)) type = TknType.MatchKeyword;
-                    else if (KeywordCmp(TknType.DeferKeyword)) type = TknType.DeferKeyword;
-                    else if (KeywordCmp(TknType.FalseLiteral)) type = TknType.FalseLiteral;
-                    break;
-                }
-            case 6:
-                {
-                    if (KeywordCmp(TknType.DeleteKeyword)) type = TknType.DeleteKeyword;
-                    else if (KeywordCmp(TknType.ImportKeyword)) type = TknType.ImportKeyword;
-                    else if (KeywordCmp(TknType.RecordKeyword)) type = TknType.RecordKeyword;
-                    break;
-                }
-            case 7:
-                {
-                    if (KeywordCmp(TknType.ForEachKeyword)) type = TknType.ForEachKeyword;
-                    else if (KeywordCmp(TknType.VariantKeyword)) type = TknType.VariantKeyword;
-                    break;
-                }
-            default:
-                break;
-
-        }
+        string id = m_file.Substring(m_index, m_length);
+        TknType type = keyword_map.GetValueOrDefault(id, TknType.Identifier);
 
         if (m_length > MAX_LENGTH_IDENTIFIER)
         {
-            Utilities.Todo("Handle long Identifiers");
+            m_error = ErrKind.ID_TOO_LONG;
             return Status.Failure;
         }
 
@@ -460,30 +409,32 @@ public class Lexer
         while (true)
         {
             char c = CurrentChar();
-
-            if (c == '"')
+            switch (c)
             {
-                if (PrevChar() == '\\')
-                {
+                case '"':
+                    if (PrevChar() == '\\')
+                    {
+                        AdvanceWithLength();
+                        continue;
+                    }
+                    break;
+                case char.MinValue:
+                    m_error = ErrKind.STR_NOT_CLOSED;
+                    return Status.Failure;
+                case '\n':
+                    m_error = ErrKind.STR_NOT_CLOSED_SINGLE_LINE;
+                    return Status.Failure;
+                default:
                     AdvanceWithLength();
                     continue;
-                }
-                break;
             }
-
-            if (c == char.MinValue /* '\0' */)
-            {
-                m_error = ErrKind.STR_NOT_CLOSED;
-                return Status.Failure;
-            }
-
-            AdvanceWithLength();
+            break;
         }
         AdvanceWithLength(); // '"'
 
         if (m_length > MAX_LENGTH_STRING)
         {
-            Utilities.Todo("Handle long string");
+            m_error = ErrKind.STR_TOO_LONG;
             return Status.Failure;
         }
 
@@ -492,8 +443,7 @@ public class Lexer
     }
 
     // Status LexMultiLineComments()
-    // {
-    //     // TODO: Fix the Bugs
+    // { This Code contains bugs
     //     Utilities.Todo("implement Lex Multi line comments; Nested comments too");
     //     Advance(); // '/'
     //     Advance(); // '*'
@@ -563,11 +513,11 @@ public class Lexer
         return res;
     }
 
-    bool KeywordCmp(TknType type)
-    {
-        bool res = m_file.Substring(m_index, m_length) == TokenMethods.GetKeywordStr(type);
-        return res;
-    }
+    // bool KeywordCmp(TknType type)
+    // {
+    //     bool res = m_file.Substring(m_index, m_length) == TokenMethods.GetKeywordStr(type);
+    //     return res;
+    // }
 
     Status AddToken(TknType type)
     {

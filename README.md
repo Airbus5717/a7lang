@@ -2,8 +2,7 @@
 
 > **Warning** Still in development
 
-check examples folder for a hello world example (might change)
-check doc/SPEC.md for current language design 
+Inspired by Jai, Odin, Zig and C Programming languages
 
 ## Build/Run
 requires .net7.0+
@@ -12,5 +11,13 @@ requires .net7.0+
 - `dotnet run`
 
 
+## Example 
+```cpp
+@import "std/io" 
 
-### External libraries
+add :: (x: i32, y: i32) i32 { ret x + y }
+
+main :: () {
+    io.print("Hello, World %\n", add(1, 2))
+}
+```

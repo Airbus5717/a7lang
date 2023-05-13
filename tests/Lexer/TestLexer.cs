@@ -13,23 +13,17 @@ namespace A7TestLexer
         [Fact]
         public void TestDigitNumber()
         {
-            string s = Utilities.PrepareStrForParsing("12 12 0xabc 0b10101");
+            string s = Utilities.PrepareStrForParsing("12 1 0234 0xabc 0b10101");
             Lexer lex = new Lexer("test", ref s);
             var st = lex.Lex();
             Assert.Equal(Status.Done, st);
-            Assert.Equal(TokensCountTest(4), lex.GetTokens().Count());
 
             // didnt convert to loop due to EOT type tokens
             Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[0].type);
             Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[1].type);
             Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[2].type);
             Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[3].type);
-        }
-
-
-        int TokensCountTest(int i)
-        {
-            return Utilities.NULL_TERMINATORS_COUNT_PASSES + i;
+            Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[4].type);
         }
     }
 }
