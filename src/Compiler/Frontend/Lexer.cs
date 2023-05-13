@@ -29,7 +29,6 @@ public class Lexer
     // save state variables
     // for restoring state in error flow
     private int save_index, save_line;
-    private int KEYWORD_COUNT { get; } = 29;
     private Dictionary<string, TknType> keyword_map;
 
     public Lexer(string filename, ref string file)
@@ -66,7 +65,7 @@ public class Lexer
 
     Status LexDirector()
     {
-        char c = CurrentChar(), p = NextChar();
+        char c = CurrentChar(), n = NextChar();
         SaveState();
         SkipWhitespace();
 
@@ -92,7 +91,6 @@ public class Lexer
         m_length++; // to simplify the code
         switch (c)
         {
-            case ';': return AddToken(TknType.Terminator);
             case '{': return AddToken(TknType.OpenCurly);
             case '}': return AddToken(TknType.CloseCurly);
             case '(': return AddToken(TknType.OpenParen);
@@ -100,13 +98,21 @@ public class Lexer
             case '[': return AddToken(TknType.OpenSQRBrackets);
             case ']': return AddToken(TknType.CloseSQRBrackets);
             case ',': return AddToken(TknType.Comma);
-            case ':': return AddToken(TknType.Colon);
             case '&': return AddToken(TknType.BitwiseAnd);
             case '|': return AddToken(TknType.BitwiseOr);
             case '^': return AddToken(TknType.BitwiseXor);
+            case ':':
+                {
+                    // if (n == ':')
+                    // {
+                    //     m_length++;
+                    //     return AddToken(TknType.DoubleColon);
+                    // }
+                    return AddToken(TknType.Colon);
+                }
             case '.':
                 {
-                    // if (p == '.')
+                    // if (n == '.')
                     // {
                     //     // '..'
                     //     m_length++;
@@ -118,13 +124,13 @@ public class Lexer
                 }
             case '>':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '>='
                         m_length++;
                         return AddToken(TknType.GreaterEql);
                     }
-                    else if (p == '>')
+                    else if (n == '>')
                     {
                         // '>>'
                         m_length++;
@@ -135,13 +141,13 @@ public class Lexer
                 }
             case '<':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '<='
                         m_length++;
                         return AddToken(TknType.LessEql);
                     }
-                    else if (p == '<')
+                    else if (n == '<')
                     {
                         // '<<'
                         m_length++;
@@ -152,7 +158,7 @@ public class Lexer
                 }
             case '=':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '=='
                         m_length++;
@@ -163,7 +169,7 @@ public class Lexer
                 }
             case '+':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '+='
                         m_length++;
@@ -174,7 +180,7 @@ public class Lexer
                 }
             case '-':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '-='
                         m_length++;
@@ -185,7 +191,7 @@ public class Lexer
                 }
             case '*':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '*='
                         m_length++;
@@ -196,13 +202,13 @@ public class Lexer
                 }
             case '/':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '/='
                         m_length++;
                         return AddToken(TknType.DivEqual);
                     }
-                    else if (p == '/')
+                    else if (n == '/')
                     {
                         // '// single line comments'
                         while (IsNotEOF() && CurrentChar() != '\n')
@@ -220,7 +226,7 @@ public class Lexer
                 }
             case '!':
                 {
-                    if (p == '=')
+                    if (n == '=')
                     {
                         // '!='
                         m_length++;
@@ -235,6 +241,11 @@ public class Lexer
             case '\n':
                 // NOTE: SkipWhitespace() will deal with it, next iteration
                 return Status.Success;
+            case ';':
+                {
+                    AddTerminator();
+                    return Status.Success;
+                }
             case char.MinValue: // '\0'
                 {
                     // NOTE(5717): Extra END OF TOKENS as delimiters
@@ -251,11 +262,11 @@ public class Lexer
 
     Status LexNumeric()
     {
-        char c = CurrentChar(), p = NextChar();
+        char c = CurrentChar(), n = NextChar();
 
         if (c == '0')
         {
-            switch (p)
+            switch (n)
             {
                 case 'x': return LexHexIntLiteral();
                 case 'b': return LexBinaryIntLiteral();
@@ -448,17 +459,17 @@ public class Lexer
     //     Advance(); // '/'
     //     Advance(); // '*'
     //     uint deepness = 1;
-    //     char c = CurrentChar(), p = PeekChar();
+    //     char c = CurrentChar(), n = PeekChar();
     //     while (true)
     //     {
-    //         if (c == '/' && p == '*') { deepness++; Advance(); Advance(); }
-    //         if (c == '*' && p == '/') { deepness--; Advance(); Advance(); }
+    //         if (c == '/' && n == '*') { deepness++; Advance(); Advance(); }
+    //         if (c == '*' && n == '/') { deepness--; Advance(); Advance(); }
     //         // update
     //         Advance();
-    //         c = p;
-    //         p = PeekChar();
+    //         c = n;
+    //         n = PeekChar();
     //         if (deepness == 0) break;
-    //         if (p == char.MinValue) break;
+    //         if (n == char.MinValue) break;
     //     }
     //     Advance();
     //     return deepness == 0 ? Status.Success : Status.Failure;
@@ -474,11 +485,17 @@ public class Lexer
             else if (c == '\n')
             {
                 m_line++;
-                AddToken(TknType.Terminator);
+                AddTerminator();
                 Advance();
             }
             else { break; }
         }
+    }
+
+    private void AddTerminator()
+    {
+        if (m_tokens.Last().type != TknType.Terminator)
+            AddToken(TknType.Terminator);
     }
 
     void Advance() { ++m_index; }

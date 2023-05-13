@@ -14,7 +14,7 @@ class FunctionType
     TypeIndex return_type;
 }
 
-class StructType
+class RecordType
 {
     List<TypeIndex> children_types;
 }
@@ -43,6 +43,7 @@ class StringType
 
 class VariantType
 {
+    // TODO: disable variant type embedded in variants
     List<TypeIndex> variants;
 }
 
@@ -65,7 +66,7 @@ enum TypeBaseKind : byte
     String,
     Pointer,
     Function,
-    Struct,
+    Record,
     Array,
     Variant,
     Null,

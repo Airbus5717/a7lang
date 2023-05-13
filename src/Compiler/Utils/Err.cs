@@ -105,4 +105,9 @@ public class Err
     {
         Utilities.Log(ConsoleColor.Magenta, "[STAGE]: ", GetStageString(s));
     }
+
+    public static void ParserErrMsg(Parser parser)
+    {
+        Utilities.Todo("Implement parser error msgs");
+    }
 }

@@ -84,10 +84,10 @@ see file in `src/compiler/fe/Token.cs`
 ### Hello World Function
 
 ```cpp
-import "std/io";
+io :: import "std/io"
 
-fn main() {
-    io.println("Hello World");
+main :: fn() {
+    io.println("Hello World")
 }
 ```
 
@@ -104,22 +104,22 @@ fn main() {
 
 ### function
 ```cpp
-import "std/io"; 
+io :: import "std/io"
 
-fn main() {
-    io.print_i(add(1, 2));
-    io.println("");
+main :: fn() {
+    io.print_i(add(1, 2))
+    io.println("")
 }
 // to show the order of def is not important
-fn add(x: int, y: int) int { ret x + y; }
+add :: fn(x: int, y: int) int { ret x + y }
 ```
 
 ### If stmts
 
 ```cpp
-if (cond) {
+if cond {
 
-} else if (cond2) {
+} else if cond2 {
 
 } else {
 
@@ -129,25 +129,30 @@ if (cond) {
 
 
 ### loops 
-```cpp
+```d
 for {
     // infinite loop
-    break; 
+    break 
 } 
+
+cond := true
+while cond { 
+    break
+}
 
 for (i := 0; i < 10; i += 1) {
     // i++ or ++i is not allowed 
     // due to complexity of the design
 }
 
-for (i, v; arr) {
+foreach (i, v: arr) {
     
 }
 ```
 
 ### Structs
-```
-record Vec2 {
+```go
+Vec2 :: record {
     x: uint;
     y: uint;
 }
@@ -155,18 +160,14 @@ record Vec2 {
 
 ### Heap memory 
 ```cpp
-x := new Vec2;
-if (x == nil) { os.exit(1); } // todo: make handling errors better
-x.x = 1; x.y = 2;
-del x;
+x := new Vec2
+@assert(x != nil, "x is nil") // todo: make handling errors better
+x.x = 1; x.y = 2
+del x
 
-
-
-
-
-y := new Vec2[10]; // []Vec3 with size 10;
+y := new [10]Vec2 // []Vec2 with size 10;
 y.count // count is more accurate term than length 
-del y; //  
+del y //  
 ```
 
 
@@ -174,7 +175,7 @@ del y; //
 ```cpp
 // strongly typed (not an integer)
 // it will compile to integers under the hood tho
-enum Vehicle {
+Vehicle :: enum {
     Bike, 
     Car
 }  
@@ -183,13 +184,13 @@ enum Vehicle {
 
 ### defer
 ```go
-load "std/io";
+io :: import "std/io"
 
 // an example
 // the file read function is Stdlib thing
-// and it problably wouldnt be like this
-File.open("path.ext", .read);
-defer File.close();
+// and it might change
+f := io.fopen("path.ext", .READ)
+defer io.fclose(f)
 // defer means run at the end of the scope
 // but not like go's defer where is uses the function stack
 // its more like run stmt before function exits (bfr returns or end of function)
@@ -201,8 +202,8 @@ defer File.close();
 ```rs
 // allowed to be called from outsize of this file
 // by default, functions are encapsulated by the file
-pub fn incr(x: uint) {
-    ret x + 1;
+pub incr :: fn(x: uint) {
+    ret x + 1
 }
 
 ```
@@ -211,21 +212,21 @@ pub fn incr(x: uint) {
 ### cast 
 
 ```d
-x := cast(int, 1.0);
+cast(int, 1.0) // more readable
 ```
 
 
 ### match (switch) 
 
 ```cpp
-enum Status {
+Status :: enum {
     Success, Failure, Done
 }
 
 x := Status.Success;
 match (x) {
     case Status.Success: { 
-            fall; // fallthrough 
+            fall // fallthrough 
         }
     case Status.Done:  {
         /* both succ and done reach here*/
