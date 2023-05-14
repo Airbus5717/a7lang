@@ -1,62 +1,63 @@
-namespace A7;
+namespace A7.Frontend;
 
-class TypeIndex
+
+public class TypeIndex
 {
-    uint indexer_index;
-    TypeBaseKind kind;
+    uint indexer_index { get; set; }
+    TypeBaseKind kind { get; set; }
 }
 
 
-class FunctionType
+public struct FunctionType
 {
-    uint num_of_args;
-    List<TypeIndex> args_types;
-    TypeIndex return_type;
+    // uint num_of_args; use args_type's count
+    List<TypeIndex> args_types { get; set; }
+    TypeIndex return_type { get; set; }
 }
 
-class RecordType
+public struct RecordType
 {
-    List<TypeIndex> children_types;
+    List<TypeIndex> children_types { get; set; }
 }
 
-class IntType
+public struct IntType
 {
-    uint size_in_bits;
-    bool is_signed;
+    uint size_in_bits { get; set; }
+    bool is_signed { get; set; }
 }
 
-class FloatType
+public struct FloatType
 {
-    uint size_in_bits;
+    uint size_in_bits { get; set; }
 }
 
-class ArrayType
+public struct ArrayType
 {
-    uint count;
-    TypeIndex child_type;
+    uint count { get; set; }
+    TypeIndex child_type { get; set; }
 }
 
-class StringType
+public struct StringType
 {
-    uint count;
+    uint count { get; set; }
 }
 
-class VariantType
+public struct VariantType
 {
     // TODO: disable variant type embedded in variants
-    List<TypeIndex> variants;
+    List<TypeIndex> variants { get; set; }
 }
 
-class TypeSegment
+public struct TypeSegment
 {
-    List<TypeIndex> indexer;
-    List<IntType> ints_types;
-    List<FloatType> float_types;
-    List<ArrayType> array_types;
-    List<FunctionType> function_type;
+    List<TypeIndex> indexer { get; set; }
+    List<IntType> ints_types { get; set; }
+    List<FloatType> float_types { get; set; }
+    List<ArrayType> array_types { get; set; }
+    List<FunctionType> function_type { get; set; }
 }
 
-enum TypeBaseKind : byte
+internal enum TypeBaseKind : byte
 {
     Void,
     Int,

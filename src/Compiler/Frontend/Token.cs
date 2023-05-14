@@ -1,6 +1,8 @@
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+
 namespace A7.Frontend;
 
-using A7.Utils;
 
 public static class TokenMethods
 {
@@ -40,7 +42,6 @@ public static class TokenMethods
     }
 }
 
-
 public struct Token
 {
     public int index { get; }
@@ -57,6 +58,23 @@ public struct Token
         this.type = type;
     }
 
+    public override string ToString()
+    {
+        return "Token{index: " + index + ", length: " + length + ", line: " + line + "}";
+    }
+
+    public bool Equals(Token token)
+    {
+        return index == token.index &&
+              length == token.length &&
+              line == token.line &&
+              type == token.type;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(index, length, line, type);
+    }
 }
 
 public enum TknType : byte

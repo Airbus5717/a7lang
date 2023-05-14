@@ -21,7 +21,7 @@ public class Lexer
 
     private List<Token> m_tokens;
     private int m_index, m_length, m_line;
-    private ErrKind m_error;
+    private LexerErr m_error;
 
     public string m_file { get; }
     public string filename { get; }
@@ -38,7 +38,7 @@ public class Lexer
         this.m_tokens = new List<Token>(file.Length / 4);
         this.m_line = 1;
         this.m_index = 0;
-        this.m_error = ErrKind.UNKNOWN;
+        this.m_error = LexerErr.UNKNOWN;
         this.keyword_map = TokenMethods.GetKeywordMap();
     }
 
@@ -256,7 +256,7 @@ public class Lexer
             default:
                 break;
         }
-        m_error = ErrKind.UNKNOWN;
+        m_error = LexerErr.UNKNOWN;
         return Status.Failure;
     }
 
@@ -290,7 +290,7 @@ public class Lexer
 
         if (m_length > MAX_LENGTH_INT_DECIMAL)
         {
-            m_error = ErrKind.NUM_TOO_LONG;
+            m_error = LexerErr.NUM_TOO_LONG;
             return Status.Failure;
         }
         RestoreIndex();
@@ -310,7 +310,7 @@ public class Lexer
 
         if (m_length > MAX_LENGTH_INT_HEX)
         {
-            m_error = ErrKind.NUM_TOO_LONG;
+            m_error = LexerErr.NUM_TOO_LONG;
             return Status.Failure;
         }
 
@@ -329,7 +329,7 @@ public class Lexer
 
         if (m_length > MAX_LENGTH_INT_BINARY)
         {
-            m_error = ErrKind.NUM_TOO_LONG;
+            m_error = LexerErr.NUM_TOO_LONG;
             return Status.Failure;
         }
 
@@ -349,7 +349,7 @@ public class Lexer
 
         if (m_length > MAX_LENGTH_IDENTIFIER)
         {
-            m_error = ErrKind.BUILTIN_ID_TOO_LONG;
+            m_error = LexerErr.BUILTIN_ID_TOO_LONG;
             return Status.Failure;
         }
         RestoreIndex();
@@ -371,7 +371,7 @@ public class Lexer
 
         if (m_length > MAX_LENGTH_IDENTIFIER)
         {
-            m_error = ErrKind.ID_TOO_LONG;
+            m_error = LexerErr.ID_TOO_LONG;
             return Status.Failure;
         }
 
@@ -400,7 +400,7 @@ public class Lexer
                 case '\'':
                     { AdvanceWithLength(); break; }
                 default:
-                    m_error = ErrKind.NOT_VALID_ESC_CHAR;
+                    m_error = LexerErr.NOT_VALID_ESC_CHAR;
                     return Status.Failure;
             }
             if (CurrentChar() == '\'')
@@ -410,7 +410,7 @@ public class Lexer
                 return AddToken(TknType.CharLiteral);
             }
         }
-        m_error = ErrKind.INVALID_CHAR_LITERAL;
+        m_error = LexerErr.INVALID_CHAR_LITERAL;
         return Status.Failure;
     }
 
@@ -430,10 +430,10 @@ public class Lexer
                     }
                     break;
                 case char.MinValue:
-                    m_error = ErrKind.STR_NOT_CLOSED;
+                    m_error = LexerErr.STR_NOT_CLOSED;
                     return Status.Failure;
                 case '\n':
-                    m_error = ErrKind.STR_NOT_CLOSED_SINGLE_LINE;
+                    m_error = LexerErr.STR_NOT_CLOSED_SINGLE_LINE;
                     return Status.Failure;
                 default:
                     AdvanceWithLength();
@@ -445,7 +445,7 @@ public class Lexer
 
         if (m_length > MAX_LENGTH_STRING)
         {
-            m_error = ErrKind.STR_TOO_LONG;
+            m_error = LexerErr.STR_TOO_LONG;
             return Status.Failure;
         }
 
@@ -549,5 +549,5 @@ public class Lexer
     public int GetIndex() { return m_index; }
     public int GetLength() { return m_length; }
     public int GetLine() { return m_line; }
-    public ErrKind GetErr() { return m_error; }
+    public LexerErr GetErr() { return m_error; }
 }

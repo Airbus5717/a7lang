@@ -13,9 +13,16 @@ struct CompileOptions
     }
 }
 
+public class Pair<T, K>
+{
+    public T item1 { get; set; }
+    public K item2 { get; set; }
+}
+
 class Compiler
 {
-    public static Status compile(CompileOptions opts)
+
+    public static Pair<Status, Stage> compile(CompileOptions opts)
     {
         /*
             Compiling Stages
@@ -26,41 +33,57 @@ class Compiler
             5. Optimize (optional) -> partially Optimized Ast
             7. Backend Code generation -> output
         */
+        Pair<Status, Stage> status = new Pair<Status, Stage>();
+        status.item1 = Status.Failure;
 
         // STAGE: Read File
+        status.item2 = Stage.READ_FILE;
         var myFile = Utilities.ReadFile(opts.path);
-        if (myFile.m_res == Res.Err)
-            return Status.Failure;
+        if (!myFile.HasValue)
+            return status;
 
 
-
+        string file = myFile.Value;
         // STAGE: Lex File
-        var lexer = new Lexer(opts.path, ref myFile.m_item);
+        status.item2 = Stage.LEXER;
+        var lexer = new Lexer(opts.path, ref file);
         if (lexer.Lex() == Status.Failure)
-            return Status.Failure;
+            return status;
+
+        LogLexer(ref lexer); // only at debug builds
+        // STAGE: Parse Tokens
+        status.item2 = Stage.PARSER;
+        var parser = new Parser(ref lexer);
+        if (parser.Parse() == Status.Failure)
+            return status;
+
+        // TODO: STAGE: Type Check
+        // TODO: STAGE: Optimize
+        // TODO: STAGE: Intermediate representation
+        // TODO: STAGE: Backend Code Generation
+
+        status.item1 = Status.Done;
+        return status;
+    }
+
+
+    private static void LogLexer(ref Lexer l)
+    {
 #if DEBUG
         // Console.WriteLine("Tokens count: " + (lexer.m_tokens.Count-5));
-        if (myFile.m_item.LongCount() > 0x1000)
+        if (l.m_file.LongCount() > 0x1000)
         {
-            Console.WriteLine("File(len={0})\n ", myFile.m_item.LongCount());
+            Console.WriteLine("File(len={0})\n ", l.m_file.LongCount());
         }
         else
         {
-            Console.WriteLine("File(len={0})\n ", myFile.m_item.LongCount());
-            foreach (Token i in lexer.GetTokens())
+            Console.WriteLine("File(len={0})\n ", l.m_file.LongCount());
+            foreach (Token i in l.GetTokens())
             {
                 Console.WriteLine("[Token]: idx: {0}, len: {1}, type: {2}", i.index, i.length, i.type);
                 if (i.type == TknType.EOT) break;
             }
         }
 #endif
-        // TODO: STAGE: Parse Tokens
-        // TODO: STAGE: Type Check
-        // TODO: STAGE: Optimize
-        // TODO: STAGE: Intermediate representation
-        // TODO: STAGE: Backend Code Generation
-
-
-        return Status.Success;
     }
 }

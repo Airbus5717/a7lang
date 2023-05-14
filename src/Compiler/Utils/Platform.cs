@@ -2,8 +2,8 @@ namespace A7.Utils;
 
 enum Os
 {
-    Win,
-    Mac,
-    Lin,
+    Windows,
+    Macos,
+    Linux,
     Other,
 }

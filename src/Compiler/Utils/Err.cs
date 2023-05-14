@@ -4,9 +4,8 @@ using System;
 using System.Text;
 using A7.Frontend;
 
-public enum ErrKind
+public enum LexerErr
 {
-    // LEXER
     UNKNOWN,
     STR_NOT_CLOSED,
     STR_NOT_CLOSED_SINGLE_LINE,
@@ -16,7 +15,11 @@ public enum ErrKind
     BUILTIN_ID_TOO_LONG,
     NOT_VALID_ESC_CHAR,
     INVALID_CHAR_LITERAL,
-    // PARSER
+}
+
+public enum ParserErr
+{
+    UNKNOWN,
 }
 
 public enum Stage
@@ -32,19 +35,19 @@ public enum Stage
 public class Err
 {
 
-    private static string GetErrString(ErrKind kind)
+    private static string GetLexerErrString(LexerErr kind)
     {
         switch (kind)
         {
-            case ErrKind.UNKNOWN: return "Unknown";
-            case ErrKind.STR_NOT_CLOSED: return "String not closed";
-            case ErrKind.STR_NOT_CLOSED_SINGLE_LINE: return "String not closed, String literals are not allowed on multi-lines";
-            case ErrKind.NUM_TOO_LONG: return "Number literal is too long";
-            case ErrKind.STR_TOO_LONG: return "String literal is too long";
-            case ErrKind.ID_TOO_LONG: return "Identifier literal is too long";
-            case ErrKind.BUILTIN_ID_TOO_LONG: return "Builtin Identifier is too long";
-            case ErrKind.NOT_VALID_ESC_CHAR: return "Not a valid escape char";
-            case ErrKind.INVALID_CHAR_LITERAL: return "Char literal is too long";
+            case LexerErr.UNKNOWN: return "Unknown";
+            case LexerErr.STR_NOT_CLOSED: return "String not closed";
+            case LexerErr.STR_NOT_CLOSED_SINGLE_LINE: return "String not closed, String literals are not allowed on multi-lines";
+            case LexerErr.NUM_TOO_LONG: return "Number literal is too long";
+            case LexerErr.STR_TOO_LONG: return "String literal is too long";
+            case LexerErr.ID_TOO_LONG: return "Identifier literal is too long";
+            case LexerErr.BUILTIN_ID_TOO_LONG: return "Builtin Identifier is too long";
+            case LexerErr.NOT_VALID_ESC_CHAR: return "Not a valid escape char";
+            case LexerErr.INVALID_CHAR_LITERAL: return "Char literal is too long";
             default: break;
         }
         Utilities.Todo("Add an Error string for " + kind.ToString());
@@ -68,36 +71,43 @@ public class Err
 
     public static void LexerErrMsg(Lexer l)
     {
+        string filename = l.filename;
+        int line_number = l.GetLine();
+        int index = l.GetIndex();
+        int length = l.GetLength();
+        string code_inline = l.m_file.Substring(index, length);
+        string arrows = GetArrows(length);
+
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.Write("> File: {0}:{1}:", l.filename, l.GetLine());
+        Console.Write("> File: {0}:{1}:", filename, line_number);
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write(" error: ");
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine(l.GetErr());
         Console.ResetColor();
 #if DEBUG
-        Utilities.LogInfo("lex.idx:" + l.GetIndex() + ", len:" + l.GetLength());
+        Utilities.LogInfo("lex.idx:" + index + ", len:" + length);
 #endif
-        string codeInline = l.m_file.Substring(l.GetIndex(),
-             l.GetLength());
-        Console.WriteLine(" {0} | {1}", l.GetLine(), codeInline);
+        Console.WriteLine(" {0} | {1}", line_number, code_inline);
         Console.ResetColor();
         Console.Write("   | ");
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("{0}", GetArrows(l.GetLength()));
+        Console.WriteLine("{0}", arrows);
         Console.Write("> Advice: ");
         Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine("{0}", GetErrString(l.GetErr()));
+        Console.WriteLine("{0}", GetLexerErrString(l.GetErr()));
         Console.ResetColor();
         PrintStage(Stage.LEXER);
     }
 
     private static string GetArrows(int length)
     {
-        int resLen = length > 50 ? 50 : length;
+        const int MAX_LENGTH = 50;
+        int resLen = length > MAX_LENGTH ? MAX_LENGTH : length;
         string result = new StringBuilder("^".Length * resLen)
                             .Insert(0, "^", resLen)
                             .ToString();
+        if (length > MAX_LENGTH) result += "...";
         return result;
     }
 
@@ -108,6 +118,45 @@ public class Err
 
     public static void ParserErrMsg(Parser parser)
     {
-        Utilities.Todo("Implement parser error msgs");
+        Token c = parser.CurrentTkn();
+        int line = c.line;
+        int index = c.index;
+        int length = c.length;
+
+        string code_inline = parser.file.Substring(index, length);
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.Write("> File: {0}:{1}:", parser.filename, line);
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write(" error: ");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine(parser.m_error);
+        Console.ResetColor();
+#if DEBUG
+        Utilities.LogInfo("lex.idx:" + index + ", len:" + length);
+#endif
+        Console.WriteLine(" {0} | {1}", line, code_inline);
+        Console.ResetColor();
+        Console.Write("   | ");
+        Console.ForegroundColor = ConsoleColor.Red;
+        // Console.WriteLine("{0}", arrows);
+        Console.Write("> Advice: ");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine("{0}", GetParserErrString(parser.m_error));
+        Console.ResetColor();
+        PrintStage(Stage.PARSER);
+#if DEBUG
+        Utilities.PrintStackTrace();
+#endif
+
+    }
+
+    private static string GetParserErrString(ParserErr value)
+    {
+        switch (value)
+        {
+            case ParserErr.UNKNOWN: return "Unknown";
+        }
+        return "";
     }
 }

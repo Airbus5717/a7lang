@@ -10,29 +10,12 @@ public enum Status : byte
     Done,
 }
 
-public enum Res : byte
-{
-    Ok,
-    Err,
-}
-
-public class Result<T>
-{
-    public T m_item;
-    public Res m_res;
-
-    public Result(T item, Res res = Res.Ok)
-    {
-        m_item = item;
-        m_res = res;
-    }
-}
-
 public class Utilities
 {
     // TODO: use a stdlib logger
     private static readonly string[] LOG_STRINGS = {
-        "[ERROR]: ", "[INFO] : ", "[WARN] : ", "[TIME] : "
+        "[ERROR]: ", "[INFO] : ", "[WARN] : ", "[TIME] : ",
+        "[DEBUG]: "
     };
 
     public const int NULL_TERMINATORS_COUNT_FILE_READ = 10;
@@ -44,12 +27,17 @@ public class Utilities
     public static void LogInfo(string s)
         => Log(ConsoleColor.Green, LOG_STRINGS[1], s);
 
-
     public static void LogWarn(string s)
         => Log(ConsoleColor.Yellow, LOG_STRINGS[2], s);
 
     public static void LogTime(string s)
         => Log(ConsoleColor.Magenta, LOG_STRINGS[3], s);
+
+    public static void LogDebug(string s)
+    {
+        Log(ConsoleColor.Yellow, LOG_STRINGS[4], s);
+    }
+
 
     public static void Log(ConsoleColor c, string i, string s)
     {
@@ -59,7 +47,7 @@ public class Utilities
         Console.WriteLine(s);
     }
 
-    public static Result<string> ReadFile(string path)
+    public static Optional<string> ReadFile(string path)
     {
         if (Path.Exists(path))
         {
@@ -72,22 +60,23 @@ public class Utilities
             catch (Exception e)
             {
                 LogErr(e.Message);
-                return new Result<string>("", Res.Err);
+                return new Optional<string>();
             }
 
             //! NOTE: Very important check
             if (s.Length >= (int.MaxValue >> 2))
             {
                 LogErr("Too Large file: " + path);
-                return new Result<string>(s, Res.Err);
+                return new Optional<string>();
             }
 
             // add padding nul chars
-            return new Result<string>(PrepareStrForParsing(s));
+            string res = PrepareStrForParsing(s);
+            return new Optional<string>(res);
         }
 
         LogErr("File [" + path + "] not found");
-        return new Result<string>("", Res.Err);
+        return new Optional<string>();
     }
 
     public static string PrepareStrForParsing(string s)
@@ -140,7 +129,7 @@ public class Utilities
         Exit(1);
     }
 
-    private static void PrintStackTrace()
+    public static void PrintStackTrace()
     {
         Console.WriteLine(new System.Diagnostics.StackTrace().ToString());
     }
