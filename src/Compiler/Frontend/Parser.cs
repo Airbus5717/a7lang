@@ -67,11 +67,6 @@ public struct Ast
 }
 
 
-
-
-
-
-
 public class Parser
 {
     private Token[] m_tokens { get; }
@@ -252,8 +247,5 @@ public class Parser
     }
 
     private void Advance() { ++m_index; }
-
-
-
 
 }

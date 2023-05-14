@@ -13,11 +13,11 @@ requires .net7.0+
 
 ## Example 
 ```cpp
-@import "std/io" 
+io :: import "std/io"
 
-add :: (x: i32, y: i32) i32 { ret x + y }
+add :: fn(x: i32, y: i32) i32 { ret x + y }
 
-main :: () {
+main :: fn() {
     io.print("Hello, World %\n", add(1, 2))
 }
 ```
