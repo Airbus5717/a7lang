@@ -2,6 +2,9 @@ namespace A7.Frontend;
 
 using A7.Utils;
 
+/*
+    NOTE: Terminator: is a newline or semicolon
+*/
 
 /*
 TODO List:
@@ -63,7 +66,7 @@ public class Lexer
         return s;
     }
 
-    Status LexDirector()
+    private Status LexDirector()
     {
         char c = CurrentChar(), n = NextChar();
         SaveState();
@@ -83,7 +86,7 @@ public class Lexer
             return LexChar();
 
         if (c == '`')
-            Utilities.Todo("Implement multiline strings");
+            return LexMultiLineString();
 
         if (c == '@')
             return LexBuiltin();
@@ -260,7 +263,7 @@ public class Lexer
         return Status.Failure;
     }
 
-    Status LexNumeric()
+    private Status LexNumeric()
     {
         char c = CurrentChar(), n = NextChar();
 
@@ -297,7 +300,7 @@ public class Lexer
         return AddToken(reached_dot ? TknType.FloatLiteral : TknType.IntegerLiteral);
     }
 
-    Status LexHexIntLiteral()
+    private Status LexHexIntLiteral()
     {
         AdvanceWithLength(); // '0'
         AdvanceWithLength(); // 'x'
@@ -318,7 +321,7 @@ public class Lexer
         return AddToken(TknType.IntegerLiteral);
     }
 
-    Status LexBinaryIntLiteral()
+    private Status LexBinaryIntLiteral()
     {
         AdvanceWithLength(); // '0'
         AdvanceWithLength(); // 'b'
@@ -337,7 +340,7 @@ public class Lexer
     }
 
 
-    Status LexBuiltin()
+    private Status LexBuiltin()
     {
         AdvanceWithLength(); // '@'
 
@@ -356,7 +359,7 @@ public class Lexer
         return AddToken(TknType.BuiltinId);
     }
 
-    Status LexIdentifier()
+    private Status LexIdentifier()
     {
         AdvanceWithLength(); // skip the first char
         while (Char.IsAsciiLetterOrDigit(CurrentChar()) || CurrentChar() == '_')
@@ -378,7 +381,7 @@ public class Lexer
         return AddToken(type);
     }
 
-    Status LexChar()
+    private Status LexChar()
     {
         AdvanceWithLength();
         if (CurrentChar() != '\\' && NextChar() == '\'')
@@ -414,7 +417,7 @@ public class Lexer
         return Status.Failure;
     }
 
-    Status LexString()
+    private Status LexString()
     {
         AdvanceWithLength();
         while (true)
@@ -453,6 +456,43 @@ public class Lexer
         return AddToken(TknType.StringLiteral);
     }
 
+    private Status LexMultiLineString()
+    {
+        AdvanceWithLength();
+        while (true)
+        {
+            char c = CurrentChar();
+            switch (c)
+            {
+                case '`':
+                    if (PrevChar() == '\\')
+                    {
+                        AdvanceWithLength();
+                        continue;
+                    }
+                    break;
+                case char.MinValue:
+                    m_error = LexerErr.STR_NOT_CLOSED;
+                    return Status.Failure;
+                default:
+                    AdvanceWithLength();
+                    continue;
+            }
+            break;
+        }
+        AdvanceWithLength(); // '"'
+
+        if (m_length > MAX_LENGTH_STRING)
+        {
+            m_error = LexerErr.STR_TOO_LONG;
+            return Status.Failure;
+        }
+
+        RestoreIndex();
+        return AddToken(TknType.StringLiteral);
+    }
+
+
     // Status LexMultiLineComments()
     // { This Code contains bugs
     //     Utilities.Todo("implement Lex Multi line comments; Nested comments too");
@@ -475,7 +515,7 @@ public class Lexer
     //     return deepness == 0 ? Status.Success : Status.Failure;
     // }
 
-    void SkipWhitespace()
+    private void SkipWhitespace()
     {
         m_length = 1;
         while (true)
@@ -494,49 +534,45 @@ public class Lexer
 
     private void AddTerminator()
     {
+        // NOTE: No need to add duplicate terminators
+        // if the previous token is already a terminator
         if (m_tokens.Last().type != TknType.Terminator)
             AddToken(TknType.Terminator);
     }
 
-    void Advance() { ++m_index; }
-    void AdvanceWithLength() { ++m_index; ++m_length; }
+    private void Advance() { ++m_index; }
+    private void AdvanceWithLength() { ++m_index; ++m_length; }
 
     //* FOR ERROR HANDLING
-    void SaveState()
+    private void SaveState()
     {
         save_index = m_index;
         save_line = m_line;
     }
 
     //* FOR ERROR HANDLING
-    void RestoreState()
+    private void RestoreState()
     {
         m_index = save_index;
         m_line = save_line;
     }
 
-    void RestoreIndex()
+    private void RestoreIndex()
     {
         m_index -= m_length;
     }
 
-    char CurrentChar() { return m_file[m_index]; }
-    char NextChar() { return m_file[(m_index + 1)]; }
-    char PrevChar() { return m_file[(m_index - 1)]; }
+    private char CurrentChar() { return m_file[m_index]; }
+    private char NextChar() { return m_file[(m_index + 1)]; }
+    private char PrevChar() { return m_file[(m_index - 1)]; }
     // is not end of file
-    bool IsNotEOF()
+    private bool IsNotEOF()
     {
         bool res = (CurrentChar() != char.MinValue) && (m_index < m_file.Length);
         return res;
     }
 
-    // bool KeywordCmp(TknType type)
-    // {
-    //     bool res = m_file.Substring(m_index, m_length) == TokenMethods.GetKeywordStr(type);
-    //     return res;
-    // }
-
-    Status AddToken(TknType type)
+    private Status AddToken(TknType type)
     {
         m_tokens.Add(new Token(m_index, m_length, m_line, type));
         m_index += (m_length); // ADD one to go to the next

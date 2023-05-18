@@ -8,36 +8,37 @@ public static class TokenMethods
 {
     public static Dictionary<string, TknType> GetKeywordMap()
     {
-        var dict = new Dictionary<string, TknType>(30);
-        dict.Add("if", TknType.IfKeyword);
-        dict.Add("fn", TknType.FnKeyword);
-        dict.Add("as", TknType.AsKeyword);
-        dict.Add("or", TknType.OrKeyword);
-        dict.Add("and", TknType.AndKeyword);
-        dict.Add("for", TknType.ForKeyword);
-        dict.Add("ref", TknType.RefKeyword);
-        dict.Add("ret", TknType.RetKeyword);
-        dict.Add("pub", TknType.PubKeyword);
-        dict.Add("new", TknType.NewKeyword);
-        dict.Add("nil", TknType.NilLiteral);
-        dict.Add("int", TknType.IntKeyword);
-        dict.Add("flt", TknType.FltKeyword);
-        dict.Add("else", TknType.ElseKeyword);
-        dict.Add("bool", TknType.BoolKeyword);
-        dict.Add("char", TknType.CharKeyword);
-        dict.Add("enum", TknType.EnumKeyword);
-        dict.Add("fall", TknType.FallKeyword);
-        dict.Add("uint", TknType.UIntKeyword);
-        dict.Add("true", TknType.TrueLiteral);
-        dict.Add("break", TknType.BreakKeyword);
-        dict.Add("match", TknType.MatchKeyword);
-        dict.Add("defer", TknType.DeferKeyword);
-        dict.Add("false", TknType.FalseLiteral);
-        dict.Add("delete", TknType.DeleteKeyword);
-        dict.Add("import", TknType.ImportKeyword);
-        dict.Add("record", TknType.RecordKeyword);
-        dict.Add("foreach", TknType.ForEachKeyword);
-        dict.Add("variant", TknType.VariantKeyword);
+        var dict = new Dictionary<string, TknType>{
+            { "if", TknType.IfKeyword},
+            { "fn", TknType.FnKeyword},
+            { "as", TknType.AsKeyword},
+            { "or", TknType.OrKeyword},
+            { "and", TknType.AndKeyword},
+            { "for", TknType.ForKeyword},
+            { "ref", TknType.RefKeyword},
+            { "ret", TknType.RetKeyword},
+            { "pub", TknType.PubKeyword},
+            { "new", TknType.NewKeyword},
+            { "nil", TknType.NilLiteral},
+            { "int", TknType.IntKeyword},
+            { "flt", TknType.FltKeyword},
+            { "else", TknType.ElseKeyword},
+            { "bool", TknType.BoolKeyword},
+            { "char", TknType.CharKeyword},
+            { "enum", TknType.EnumKeyword},
+            { "fall", TknType.FallKeyword},
+            { "uint", TknType.UIntKeyword},
+            { "true", TknType.TrueLiteral},
+            { "break", TknType.BreakKeyword},
+            { "match", TknType.MatchKeyword},
+            { "defer", TknType.DeferKeyword},
+            { "false", TknType.FalseLiteral},
+            { "delete", TknType.DeleteKeyword},
+            { "import", TknType.ImportKeyword},
+            { "record", TknType.RecordKeyword},
+            { "foreach", TknType.ForEachKeyword},
+            { "variant", TknType.VariantKeyword}
+        };
         return dict;
     }
 }
