@@ -1,5 +1,5 @@
-
 namespace A7.CLI;
+
 class Program
 {
 

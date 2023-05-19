@@ -59,10 +59,7 @@ public class Lexer
         }
 
         if (s == Status.Failure)
-        {
-            RestoreState();
-            Err.LexerErrMsg(this);
-        }
+        { RestoreState(); Err.LexerErrMsg(this); }
         return s;
     }
 
@@ -265,6 +262,31 @@ public class Lexer
 
     private Status LexNumeric()
     {
+        // 2 small util functions in LexNumeric
+        Status LexHexIntLiteral()
+        {
+            AdvanceWithLength(); // '0'
+            AdvanceWithLength(); // 'x'
+            while (Char.IsAsciiHexDigit(CurrentChar()) || CurrentChar() == '_')
+                AdvanceWithLength();
+
+            if (m_length > MAX_LENGTH_INT_HEX)
+            { m_error = LexerErr.NUM_TOO_LONG; return Status.Failure; }
+            return AddToken(TknType.IntegerLiteral);
+        }
+
+        Status LexBinaryIntLiteral()
+        {
+            AdvanceWithLength(); // '0'
+            AdvanceWithLength(); // 'b'
+            for (char c = CurrentChar(); c == '0' || c == '1' || c == '_'; c = CurrentChar())
+                AdvanceWithLength();
+
+            if (m_length > MAX_LENGTH_INT_BINARY)
+            { m_error = LexerErr.NUM_TOO_LONG; return Status.Failure; }
+            return AddToken(TknType.IntegerLiteral);
+        }
+
         char c = CurrentChar(), n = NextChar();
 
         if (c == '0')
@@ -292,51 +314,10 @@ public class Lexer
 
 
         if (m_length > MAX_LENGTH_INT_DECIMAL)
-        {
-            m_error = LexerErr.NUM_TOO_LONG;
-            return Status.Failure;
-        }
+        { m_error = LexerErr.NUM_TOO_LONG; return Status.Failure; }
+
         RestoreIndex();
         return AddToken(reached_dot ? TknType.FloatLiteral : TknType.IntegerLiteral);
-    }
-
-    private Status LexHexIntLiteral()
-    {
-        AdvanceWithLength(); // '0'
-        AdvanceWithLength(); // 'x'
-
-        while (Char.IsAsciiHexDigit(CurrentChar()) || CurrentChar() == '_')
-        {
-            AdvanceWithLength();
-        }
-
-
-        if (m_length > MAX_LENGTH_INT_HEX)
-        {
-            m_error = LexerErr.NUM_TOO_LONG;
-            return Status.Failure;
-        }
-
-
-        return AddToken(TknType.IntegerLiteral);
-    }
-
-    private Status LexBinaryIntLiteral()
-    {
-        AdvanceWithLength(); // '0'
-        AdvanceWithLength(); // 'b'
-
-        for (char c = CurrentChar(); c == '0' || c == '1' || c == '_'; c = CurrentChar())
-            AdvanceWithLength();
-
-
-        if (m_length > MAX_LENGTH_INT_BINARY)
-        {
-            m_error = LexerErr.NUM_TOO_LONG;
-            return Status.Failure;
-        }
-
-        return AddToken(TknType.IntegerLiteral);
     }
 
 
@@ -351,10 +332,8 @@ public class Lexer
 
 
         if (m_length > MAX_LENGTH_IDENTIFIER)
-        {
-            m_error = LexerErr.BUILTIN_ID_TOO_LONG;
-            return Status.Failure;
-        }
+        { m_error = LexerErr.BUILTIN_ID_TOO_LONG; return Status.Failure; }
+
         RestoreIndex();
         return AddToken(TknType.BuiltinId);
     }
@@ -370,13 +349,11 @@ public class Lexer
         RestoreIndex();
 
         string id = m_file.Substring(m_index, m_length);
+        // NOTE: get token type for keyword (default to identifier)
         TknType type = keyword_map.GetValueOrDefault(id, TknType.Identifier);
 
         if (m_length > MAX_LENGTH_IDENTIFIER)
-        {
-            m_error = LexerErr.ID_TOO_LONG;
-            return Status.Failure;
-        }
+        { m_error = LexerErr.ID_TOO_LONG; return Status.Failure; }
 
         return AddToken(type);
     }
@@ -433,11 +410,15 @@ public class Lexer
                     }
                     break;
                 case char.MinValue:
-                    m_error = LexerErr.STR_NOT_CLOSED;
-                    return Status.Failure;
+                    {
+                        m_error = LexerErr.STR_NOT_CLOSED;
+                        return Status.Failure;
+                    }
                 case '\n':
-                    m_error = LexerErr.STR_NOT_CLOSED_SINGLE_LINE;
-                    return Status.Failure;
+                    {
+                        m_error = LexerErr.STR_NOT_CLOSED_SINGLE_LINE;
+                        return Status.Failure;
+                    }
                 default:
                     AdvanceWithLength();
                     continue;
@@ -447,10 +428,7 @@ public class Lexer
         AdvanceWithLength(); // '"'
 
         if (m_length > MAX_LENGTH_STRING)
-        {
-            m_error = LexerErr.STR_TOO_LONG;
-            return Status.Failure;
-        }
+        { m_error = LexerErr.STR_TOO_LONG; return Status.Failure; }
 
         RestoreIndex();
         return AddToken(TknType.StringLiteral);
@@ -472,8 +450,10 @@ public class Lexer
                     }
                     break;
                 case char.MinValue:
-                    m_error = LexerErr.STR_NOT_CLOSED;
-                    return Status.Failure;
+                    {
+                        m_error = LexerErr.STR_NOT_CLOSED;
+                        return Status.Failure;
+                    }
                 default:
                     AdvanceWithLength();
                     continue;
@@ -483,10 +463,7 @@ public class Lexer
         AdvanceWithLength(); // '"'
 
         if (m_length > MAX_LENGTH_STRING)
-        {
-            m_error = LexerErr.STR_TOO_LONG;
-            return Status.Failure;
-        }
+        { m_error = LexerErr.STR_TOO_LONG; return Status.Failure; }
 
         RestoreIndex();
         return AddToken(TknType.StringLiteral);
