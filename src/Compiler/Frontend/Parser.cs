@@ -27,14 +27,12 @@ public struct Function
 public struct VariableDef
 {
     int id_token_index { get; set; }
-
 }
 
 public struct Record
 {
     int id_token_index { get; set; }
     VariableDef[] children { get; set; }
-
 }
 
 public struct Enum

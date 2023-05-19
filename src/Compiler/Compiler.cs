@@ -67,7 +67,7 @@ class Compiler
     }
 
 
-    private static void LogLexer(ref Lexer l)
+    public static void LogLexer(ref Lexer l)
     {
 #if DEBUG
         // Console.WriteLine("Tokens count: " + (lexer.m_tokens.Count-5));
