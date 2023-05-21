@@ -30,18 +30,17 @@ public struct Optional<T>
 
     public override bool Equals(object obj)
     {
-        if (obj is Optional<T>)
-            return this.Equals((Optional<T>)obj);
-        else
-            return false;
+        if (obj is Optional<T>) return this.Equals((Optional<T>)obj);
+
+        return false;
     }
 
     public bool Equals(Optional<T> other)
     {
         if (HasValue && other.HasValue)
             return object.Equals(value, other.value);
-        else
-            return HasValue == other.HasValue;
+
+        return HasValue == other.HasValue;
     }
 
     public override int GetHashCode()

@@ -1,5 +1,7 @@
 io :: import "std/io"
 
+// single line comment
+
 main :: fn() {
      io.println("Hello, World")
 }

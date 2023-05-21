@@ -20,6 +20,8 @@ public enum LexerErr
 public enum ParserErr
 {
     UNKNOWN,
+    IMPORT_EXPECT_STRING,
+    IMPORT_EXPECT_TERMINATOR,
 }
 
 public enum Stage
@@ -111,14 +113,14 @@ public class Err
         return result;
     }
 
-    private static void PrintStage(Stage s)
+    public static void PrintStage(Stage s)
     {
         Utilities.Log(ConsoleColor.Magenta, "[STAGE]: ", GetStageString(s));
     }
 
     public static void ParserErrMsg(Parser parser)
     {
-        Token c = parser.CurrentTkn();
+        Token c = parser.GetCurrentToken();
         int line = c.line;
         int index = c.index;
         int length = c.length;
@@ -157,6 +159,8 @@ public class Err
         {
             case ParserErr.UNKNOWN: return "Unknown";
         }
+
+        Utilities.Todo("implement convert to string for parser errors");
         return "";
     }
 }

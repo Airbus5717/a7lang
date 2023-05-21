@@ -2,10 +2,15 @@ namespace A7.Frontend;
 
 using A7.Utils;
 
+public struct ValNode {
+
+}
+
+
 public struct Import
 {
-    public int id_token_index { get; private set; }
-    public int str_token_index { get; private set; }
+    public int id_token_index { get; }
+    public int str_token_index { get; }
 
     public Import(int id_index, int str_index)
     {
@@ -16,7 +21,7 @@ public struct Import
 
 public struct Function
 {
-    public FunctionType type { get; private set; }
+    public FunctionType type { get; }
 
     public Function(FunctionType ftype)
     {
@@ -26,24 +31,61 @@ public struct Function
 
 public struct VariableDef
 {
-    int id_token_index { get; set; }
+    int id_token_index { get; }
+    TypeIndex type { get; }
+    Optional<ValNode> value;
+
+    public VariableDef(int id_token_index, TypeIndex type)
+    {
+        this.id_token_index = id_token_index;
+        this.type = type;
+    }
 }
 
 public struct Record
 {
-    int id_token_index { get; set; }
-    VariableDef[] children { get; set; }
+    int id_token_index { get; }
+    List<VariableDef> children { get; }
+
+    public Record(int id_token_index, List<VariableDef> children)
+    {
+        this.id_token_index = id_token_index;
+        this.children = children;
+    }
+}
+
+public struct Variant
+{
+    int id_token_index { get; }
+    List<VariableDef> children { get; }
+
+    public Variant(int id_token_index, List<VariableDef> children)
+    {
+        this.id_token_index = id_token_index;
+        this.children = children;
+    }
+
+    public void AddVariant(VariableDef var_def)
+    {
+        this.children.Add(var_def);
+    }
 }
 
 public struct Enum
 {
     int id_token_index { get; set; }
-    Token[] ids { get; set; }
+    List<Token> children_id { get; set; }
+
+    public Enum(int id_token_index, List<Token> children_id)
+    {
+        this.id_token_index = id_token_index;
+        this.children_id = children_id;
+    }
 }
 
 public struct Ast
 {
-    public Token[] tokens { get; private set; }
+    public Token[] tokens { get; }
     public List<Import> imports { get; private set; }
     public List<Function> functions { get; private set; }
     public List<Record> records { get; private set; }
@@ -62,6 +104,13 @@ public struct Ast
     {
         imports.Add(new Import(id_index, str_index));
     }
+
+    public void AddFunction(Function fn)
+    {
+        functions.Add(fn);
+    }
+
+    public void AddRecord() {}
 }
 
 
@@ -71,18 +120,18 @@ public class Parser
     private int m_index;
     private int saved_index;
 
-    public Ast ast { get; private set; }
+    public Ast m_ast { get; private set; }
     public string filename { get; }
     public string file { get; }
 
-    public ParserErr m_error { get; }
+    public ParserErr m_error { get; set; } = ParserErr.UNKNOWN;
 
     public Parser(ref Lexer _lexer)
     {
         this.filename = _lexer.filename;
         this.file = _lexer.m_file;
         this.m_tokens = _lexer.GetTokens();
-        this.ast = new Ast(_lexer.GetTokens());
+        this.m_ast = new Ast(_lexer.GetTokens());
         this.m_index = 0;
         this.saved_index = 0;
         this.m_error = ParserErr.UNKNOWN;
@@ -123,8 +172,8 @@ public class Parser
         Token c = CurrentTkn(), n = NextTkn();
         switch (c.type)
         {
-            case TknType.Identifier: s = ParseAfterIdentifier(); break;
-            case TknType.EOT: { return Status.Done; }
+            case TknType.Identifier: s = ParseGlobalAfterIdentifier(); break;
+            case TknType.EOT: return Status.Done;
             default: break;
         }
 
@@ -132,23 +181,19 @@ public class Parser
     }
 
 
-    private Status ParseAfterIdentifier()
+    private Status ParseGlobalAfterIdentifier()
     {
         Advance();
         if (ExpectAndConsume(TknType.Colon) == Status.Failure) return Status.Failure;
         if (ExpectAndConsume(TknType.Colon) == Status.Success)
-        {
-            return ParseDefinition();
-        }
-
-
+        { return ParseGlobalDefinition(); }
 
         ParseType();
         Utilities.Todo("Handle Global Mutables & Unwanted Tokens");
         return Status.Failure;
     }
 
-    private Status ParseDefinition()
+    private Status ParseGlobalDefinition()
     {
         switch (CurrentTkn().type)
         {
@@ -197,53 +242,46 @@ public class Parser
 
     private Status ParseImports()
     {
+        // io :: import "string_path"
+        // ^^-^^--- already advanced
+
         Advance(); // 'import'
-        if (ExpectAndConsume(TknType.StringLiteral) == Status.Failure) return Status.Failure;
-        ast.AddImport(m_index - 2, m_index);
-        var res = ExpectAndConsume(TknType.Terminator);
+        if (ExpectAndConsume(TknType.StringLiteral, ParserErr.IMPORT_EXPECT_STRING) == Status.Failure)
+            return Status.Failure;
+
+        // Add identifier index as (index-2), and string index as current index
+        m_ast.AddImport(m_index - 2, m_index);
+
+        // return status of finding a statement terminator
+        Status res = ExpectAndConsume(TknType.Terminator, ParserErr.IMPORT_EXPECT_TERMINATOR);
         return res;
     }
 
-    private Status ExpectAndConsume(TknType type)
+    private Status ExpectAndConsume(TknType type, ParserErr err = ParserErr.UNKNOWN)
     {
         Token c = CurrentTkn();
         bool res = c.type == type;
         if (res) { Advance(); }
-#if DEBUG
         else
         {
+            m_error = err;
+#if DEBUG
             Utilities.LogDebug(c.ToString());
-        }
 #endif
+        }
         return res ? Status.Success : Status.Failure;
     }
 
 
-    private void SaveState()
-    {
-        saved_index = m_index;
-    }
-
-    private void RestoreState()
-    {
-        m_index = saved_index;
-    }
-
-    public Token CurrentTkn()
-    {
-        return m_tokens[m_index];
-    }
-
-    private Token NextTkn()
-    {
-        return m_tokens[(m_index + 1)];
-    }
-
-    private Token PrevTkn()
-    {
-        return m_tokens[(m_index - 1)];
-    }
-
+    private void SaveState() { saved_index = m_index; }
+    private void RestoreState() { m_index = saved_index; }
+    private Token CurrentTkn() { return m_tokens[m_index]; }
+    private Token NextTkn() { return m_tokens[(m_index + 1)]; }
+    private Token PrevTkn() { return m_tokens[(m_index - 1)]; }
     private void Advance() { ++m_index; }
+
+
+    // other "useless" methods
+    public Token GetCurrentToken() { return CurrentTkn(); }
 
 }

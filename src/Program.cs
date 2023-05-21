@@ -5,6 +5,16 @@ class Program
 
     static void Main(string[] args)
     {
-        A7.Compiler.compile(new A7.CompileOptions("main.a7"));
+        var i = A7.Compiler.compile(new A7.CompileOptions("main.a7"));
+        Utils.Err.PrintStage(i.item2);
+        if (i.item1 == Utils.Status.Failure)
+        {
+            Utils.Utilities.LogErr("Failed");
+            Environment.Exit(1);
+        }
+        else
+        {
+            Utils.Utilities.LogInfo("SUCCESS");
+        }
     }
 }

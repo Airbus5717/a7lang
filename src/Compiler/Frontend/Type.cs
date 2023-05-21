@@ -5,6 +5,18 @@ public class TypeIndex
 {
     uint indexer_index { get; set; }
     TypeBaseKind kind { get; set; }
+
+    public bool Equals(TypeIndex other)
+    {
+        return indexer_index == other.indexer_index &&
+               kind == other.kind;
+    }
+
+    public override string ToString()
+    {
+        Utils.Utilities.Todo("to implement to string for types");
+        return "unknown";
+    }
 }
 
 
@@ -71,6 +83,6 @@ internal enum TypeBaseKind : byte
     Array,
     Variant,
     Null,
-    Any,
+    //Any,
 }
 

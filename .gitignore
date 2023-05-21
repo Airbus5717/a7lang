@@ -1,3 +1,4 @@
-bin
-obj
+bin/
+obj/
 main.a7
+*.swp

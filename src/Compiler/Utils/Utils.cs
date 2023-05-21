@@ -10,6 +10,9 @@ public enum Status : byte
     Done,
 }
 
+
+
+
 public class Utilities
 {
     // TODO: use a stdlib logger
@@ -70,9 +73,9 @@ public class Utilities
                 return new Optional<string>();
             }
 
-            // add padding nul chars
-            string res = PrepareStrForParsing(s);
-            return new Optional<string>(res);
+            // add padding null chars
+            var res = new Optional<string>(PrepareStrForParsing(s));
+            return res;
         }
 
         LogErr("File [" + path + "] not found");

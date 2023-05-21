@@ -50,7 +50,9 @@ class Compiler
         if (lexer.Lex() == Status.Failure)
             return status;
 
-        LogLexer(ref lexer); // only at debug builds
+#if DEBUG
+        DebugCompile(ref lexer); // only at debug builds
+#endif
         // STAGE: Parse Tokens
         status.item2 = Stage.PARSER;
         var parser = new Parser(ref lexer);
@@ -67,23 +69,26 @@ class Compiler
     }
 
 
-    public static void LogLexer(ref Lexer l)
+    public static void DebugCompile(ref Lexer l)
     {
-#if DEBUG
         // Console.WriteLine("Tokens count: " + (lexer.m_tokens.Count-5));
-        if (l.m_file.LongCount() > 0x1000)
+        Console.WriteLine("File(name={0}, len={1})\n ", l.filename, l.m_file.LongCount());
+        if (l.m_file.LongCount() < 0x1000)
         {
-            Console.WriteLine("File(len={0})\n ", l.m_file.LongCount());
-        }
-        else
-        {
-            Console.WriteLine("File(len={0})\n ", l.m_file.LongCount());
+            Utils.Err.PrintStage(Stage.READ_FILE);
+            Console.WriteLine("```\n{0}```", l.m_file);
+            Utils.Err.PrintStage(Stage.LEXER);
             foreach (Token i in l.GetTokens())
             {
                 Console.WriteLine("[Token]: idx: {0}, len: {1}, type: {2}", i.index, i.length, i.type);
                 if (i.type == TknType.EOT) break;
             }
+            Utils.Err.PrintStage(Stage.PARSER);
+            // TODO:
         }
-#endif
+        else
+        {
+            Console.WriteLine("The file is just too large");
+        }
     }
 }
