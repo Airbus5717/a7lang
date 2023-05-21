@@ -11,8 +11,6 @@ public enum Status : byte
 }
 
 
-
-
 public class Utilities
 {
     // TODO: use a stdlib logger
@@ -37,9 +35,7 @@ public class Utilities
         => Log(ConsoleColor.Magenta, LOG_STRINGS[3], s);
 
     public static void LogDebug(string s)
-    {
-        Log(ConsoleColor.Yellow, LOG_STRINGS[4], s);
-    }
+        => Log(ConsoleColor.Yellow, LOG_STRINGS[4], s);
 
 
     public static void Log(ConsoleColor c, string i, string s)
@@ -133,7 +129,6 @@ public class Utilities
     }
 
     public static void PrintStackTrace()
-    {
-        Console.WriteLine(new System.Diagnostics.StackTrace().ToString());
-    }
+        => Console.WriteLine(new System.Diagnostics.StackTrace().ToString());
+
 }

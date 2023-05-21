@@ -1,45 +1,8 @@
 
+using System.Collections.ObjectModel;
+
 namespace A7.Frontend;
 
-
-public static class TokenMethods
-{
-    public static Dictionary<string, TknType> GetKeywordMap()
-    {
-        var dict = new Dictionary<string, TknType>{
-            { "if", TknType.IfKeyword},
-            { "fn", TknType.FnKeyword},
-            { "as", TknType.AsKeyword},
-            { "or", TknType.OrKeyword},
-            { "and", TknType.AndKeyword},
-            { "for", TknType.ForKeyword},
-            { "ref", TknType.RefKeyword},
-            { "ret", TknType.RetKeyword},
-            { "pub", TknType.PubKeyword},
-            { "new", TknType.NewKeyword},
-            { "nil", TknType.NilLiteral},
-            { "int", TknType.IntKeyword},
-            { "flt", TknType.FltKeyword},
-            { "else", TknType.ElseKeyword},
-            { "bool", TknType.BoolKeyword},
-            { "char", TknType.CharKeyword},
-            { "enum", TknType.EnumKeyword},
-            { "fall", TknType.FallKeyword},
-            { "uint", TknType.UIntKeyword},
-            { "true", TknType.TrueLiteral},
-            { "break", TknType.BreakKeyword},
-            { "match", TknType.MatchKeyword},
-            { "defer", TknType.DeferKeyword},
-            { "false", TknType.FalseLiteral},
-            { "delete", TknType.DeleteKeyword},
-            { "import", TknType.ImportKeyword},
-            { "record", TknType.RecordKeyword},
-            { "foreach", TknType.ForEachKeyword},
-            { "variant", TknType.VariantKeyword}
-        };
-        return dict;
-    }
-}
 
 public struct Token
 {

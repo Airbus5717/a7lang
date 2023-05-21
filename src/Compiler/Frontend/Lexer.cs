@@ -9,7 +9,6 @@ using A7.Utils;
 /*
 TODO List:
     - Multiline comments
-    - Multiline strings
 */
 
 public class Lexer
@@ -32,7 +31,30 @@ public class Lexer
     // save state variables
     // for restoring state in error flow
     private int save_index, save_line;
-    private Dictionary<string, TknType> keyword_map;
+
+    private static readonly Dictionary<string, TknType> keyword_map = new Dictionary<string, TknType>{
+            { "if", TknType.IfKeyword}, { "fn", TknType.FnKeyword},
+            { "as", TknType.AsKeyword}, { "or", TknType.OrKeyword},
+
+            { "and", TknType.AndKeyword}, { "for", TknType.ForKeyword},
+            { "ref", TknType.RefKeyword}, { "ret", TknType.RetKeyword},
+            { "pub", TknType.PubKeyword}, { "new", TknType.NewKeyword},
+            { "nil", TknType.NilLiteral}, { "int", TknType.IntKeyword},
+            { "flt", TknType.FltKeyword},
+
+            { "else", TknType.ElseKeyword},
+            { "bool", TknType.BoolKeyword}, { "char", TknType.CharKeyword},
+            { "enum", TknType.EnumKeyword}, { "fall", TknType.FallKeyword},
+            { "uint", TknType.UIntKeyword}, { "true", TknType.TrueLiteral},
+
+            { "break", TknType.BreakKeyword}, { "match", TknType.MatchKeyword},
+            { "defer", TknType.DeferKeyword}, { "false", TknType.FalseLiteral},
+
+            { "delete", TknType.DeleteKeyword}, { "import", TknType.ImportKeyword},
+            { "record", TknType.RecordKeyword},
+
+            { "foreach", TknType.ForEachKeyword}, { "variant", TknType.VariantKeyword}
+        };
 
     public Lexer(string filename, ref string file)
     {
@@ -42,7 +64,6 @@ public class Lexer
         this.m_line = 1;
         this.m_index = 0;
         this.m_error = LexerErr.UNKNOWN;
-        this.keyword_map = TokenMethods.GetKeywordMap();
     }
 
     // NOTE(5717): Lexer starting point
