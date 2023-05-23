@@ -50,7 +50,7 @@ public class Utilities
     {
         if (Path.Exists(path))
         {
-            string s = "";
+            string s = string.Empty;
             try
             {
                 // NOTE: Exceptions are considered a bad practice

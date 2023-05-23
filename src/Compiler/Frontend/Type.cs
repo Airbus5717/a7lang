@@ -69,20 +69,30 @@ public struct TypeSegment
     List<FunctionType> function_type { get; set; }
 }
 
-internal enum TypeBaseKind : byte
+
+public static class TypeDomains {
+    public static bool IsValidFunctionReturnType(TypeBaseKind k)
+        => (k != TypeBaseKind.Function);
+
+    public static bool IsValidFunctionArgumentType(TypeBaseKind k)
+        => IsValidFunctionReturnType(k);
+}
+
+public enum TypeBaseKind : byte
 {
-    Void,
     Int,
-    Enum,
+    UInt,
     Float,
     Bool,
+    Enum,
     String,
+    Array,
     Pointer,
     Function,
+    VoidFunction,  // NOTE: ????
     Record,
-    Array,
     Variant,
-    Null,
-    //Any,
+    //Null, // null is pointer type
+    //Any, // NOTE: for now
 }
 

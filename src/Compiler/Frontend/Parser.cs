@@ -76,8 +76,7 @@ public struct Enum
     int id_token_index { get; set; }
     List<Token> children_id { get; set; }
 
-    public Enum(int id_token_index, List<Token> children_id)
-    {
+    public Enum(int id_token_index, List<Token> children_id) {
         this.id_token_index = id_token_index;
         this.children_id = children_id;
     }
@@ -131,7 +130,7 @@ public class Parser
         this.filename = _lexer.filename;
         this.file = _lexer.m_file;
         this.m_tokens = _lexer.GetTokens();
-        this.m_ast = new Ast(_lexer.GetTokens());
+        this.m_ast = new Ast(this.m_tokens);
         this.m_index = 0;
         this.saved_index = 0;
         this.m_error = ParserErr.UNKNOWN;
@@ -202,11 +201,10 @@ public class Parser
             case TknType.RecordKeyword: return ParseRecords();
             case TknType.EnumKeyword: return ParseEnums();
             case TknType.VariantKeyword: return ParseVariants();
-
             default:
                 break;
         }
-        Utilities.Todo("Handle Globals");
+        Utilities.Todo("Handle Global Constants");
         return Status.Failure;
     }
 
@@ -218,24 +216,34 @@ public class Parser
 
     private Status ParseRecords()
     {
+        Advance(); // skip 'record'
         Utilities.Todo("Parse Records");
         return Status.Failure;
     }
 
     private Status ParseVariants()
     {
+        Advance(); // skip 'variant'
         Utilities.Todo("Parse Variants");
         return Status.Failure;
     }
 
     private Status ParseEnums()
     {
+        Advance(); // skip 'enum'
         Utilities.Todo("Parse Enums");
         return Status.Failure;
     }
 
     private Status ParseFunctions()
     {
+        /*
+         * id :: fn() { ... }
+         * id :: fn() return_type { ... }
+         * id :: fn(arg1: type1, ...) { ... }
+         * id :: fn(arg1: type1, ...) return_type { ... }
+         */
+        Advance(); // skip 'fn'
         Utilities.Todo("Parse Functions");
         return Status.Failure;
     }
@@ -245,12 +253,16 @@ public class Parser
         // io :: import "string_path"
         // ^^-^^--- already advanced
 
-        Advance(); // 'import'
-        if (ExpectAndConsume(TknType.StringLiteral, ParserErr.IMPORT_EXPECT_STRING) == Status.Failure)
+        Advance(); // skip 'import'
+
+        // Expect a string else fail
+        if (ExpectAndConsume(TknType.StringLiteral, ParserErr.IMPORT_EXPECT_STRING)
+            == Status.Failure)
             return Status.Failure;
 
         // Add identifier index as (index-2), and string index as current index
         m_ast.AddImport(m_index - 2, m_index);
+        // pretty much done, only requires a terminator
 
         // return status of finding a statement terminator
         Status res = ExpectAndConsume(TknType.Terminator, ParserErr.IMPORT_EXPECT_TERMINATOR);
@@ -259,9 +271,10 @@ public class Parser
 
     private Status ExpectAndConsume(TknType type, ParserErr err = ParserErr.UNKNOWN)
     {
+        // NOTE: if next token's type matched the token type then Advance(), else report failure
         Token c = CurrentTkn();
-        bool res = c.type == type;
-        if (res) { Advance(); }
+        bool eql = c.type == type;
+        if (eql) { Advance(); }
         else
         {
             m_error = err;
@@ -269,7 +282,7 @@ public class Parser
             Utilities.LogDebug(c.ToString());
 #endif
         }
-        return res ? Status.Success : Status.Failure;
+        return eql ? Status.Success : Status.Failure;
     }
 
 
