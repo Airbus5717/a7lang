@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using Xunit;
 
 using A7.Frontend;
@@ -12,31 +14,25 @@ public class TestLexer
     [Fact]
     public void TestDigitNumber()
     {
-        string s = Utilities.PrepareStrForParsing("12 1 1231_2342314 0234 0xab_c 0b1_0101");
-        Lexer lex = new Lexer("test", ref s);
-        var st = lex.Lex();
-        Assert.Equal(Status.Done, st);
+        Token[] tkns = LexAString("12 1 1231_2342314 0234 0xab_c 0b1_0101");
 
         // didnt convert to loop due to EOT type tokens
-        Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[0].type);
-        Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[1].type);
-        Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[2].type);
-        Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[3].type);
-        Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[4].type);
-        Assert.Equal(TknType.IntegerLiteral, lex.GetTokens()[5].type);
+        Assert.Equal(TknType.IntegerLiteral, tkns[0].type);
+        Assert.Equal(TknType.IntegerLiteral, tkns[1].type);
+        Assert.Equal(TknType.IntegerLiteral, tkns[2].type);
+        Assert.Equal(TknType.IntegerLiteral, tkns[3].type);
+        Assert.Equal(TknType.IntegerLiteral, tkns[4].type);
+        Assert.Equal(TknType.IntegerLiteral, tkns[5].type);
     }
 
     [Fact]
     public void TestChars()
     {
-        string s = "'\n' 'd' // single chars";
-        s = Utilities.PrepareStrForParsing(s);
-        Lexer lex = new Lexer("test", ref s);
-        var st = lex.Lex();
-        Assert.Equal(Status.Done, st);
+        Token[] tkns = LexAString("'\n' 'd' // single chars");
+
         // didnt convert to loop due to EOT type tokens
-        Assert.Equal(TknType.CharLiteral, lex.GetTokens()[0].type);
-        Assert.Equal(TknType.CharLiteral, lex.GetTokens()[1].type);
+        Assert.Equal(TknType.CharLiteral, tkns[0].type);
+        Assert.Equal(TknType.CharLiteral, tkns[1].type);
     }
 
     [Fact]
@@ -60,12 +56,20 @@ public class TestLexer
         sdflkasdjf;alsdkf;lkasjdfl;kqjwopeiruqopewiurqpoweiurpoqwieuropqwiuropeiuqwpmxcv;jkgsdf;jgkl;sfdjl;gkjsd;lkfjgl;skdfjg;lsdk
         `
         ";
-        s = Utilities.PrepareStrForParsing(s);
-        Lexer lex = new Lexer("test", ref s);
+        Token[] tkns = LexAString(s);
+
+        // didnt convert to loop due to EOT type tokens
+        Assert.Equal(TknType.StringLiteral, tkns[0].type);
+        Assert.Equal(TknType.StringLiteral, tkns[1].type);
+    }
+
+    private Token[] LexAString(string input, [CallerMemberName] string member = "")
+    {
+        string s = Utilities.PrepareStrForParsing(input);
+        Lexer lex = new Lexer(member, ref s);
         var st = lex.Lex();
         Assert.Equal(Status.Done, st);
-        // didnt convert to loop due to EOT type tokens
-        Assert.Equal(TknType.StringLiteral, lex.GetTokens()[0].type);
-        Assert.Equal(TknType.StringLiteral, lex.GetTokens()[1].type);
+
+        return lex.GetTokens();
     }
 }

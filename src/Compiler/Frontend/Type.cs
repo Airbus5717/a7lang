@@ -70,7 +70,8 @@ public struct TypeSegment
 }
 
 
-public static class TypeDomains {
+public static class TypeDomains
+{
     public static bool IsValidFunctionReturnType(TypeBaseKind k)
         => (k != TypeBaseKind.Function);
 

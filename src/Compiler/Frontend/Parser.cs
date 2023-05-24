@@ -2,7 +2,8 @@ namespace A7.Frontend;
 
 using A7.Utils;
 
-public struct ValNode {
+public struct ValNode
+{
 
 }
 
@@ -76,7 +77,8 @@ public struct Enum
     int id_token_index { get; set; }
     List<Token> children_id { get; set; }
 
-    public Enum(int id_token_index, List<Token> children_id) {
+    public Enum(int id_token_index, List<Token> children_id)
+    {
         this.id_token_index = id_token_index;
         this.children_id = children_id;
     }
@@ -90,7 +92,7 @@ public struct Ast
     public List<Record> records { get; private set; }
     public List<Enum> enums { get; private set; }
 
-    public Ast(Token[] tkns)
+    public Ast(ref Token[] tkns)
     {
         this.tokens = tkns;
         this.imports = new List<Import>();
@@ -109,13 +111,13 @@ public struct Ast
         functions.Add(fn);
     }
 
-    public void AddRecord() {}
+    public void AddRecord() { }
 }
 
 
 public class Parser
 {
-    private Token[] m_tokens { get; }
+    private readonly Token[] m_tokens;
     private int m_index;
     private int saved_index;
 
@@ -130,7 +132,7 @@ public class Parser
         this.filename = _lexer.filename;
         this.file = _lexer.m_file;
         this.m_tokens = _lexer.GetTokens();
-        this.m_ast = new Ast(this.m_tokens);
+        this.m_ast = new Ast(ref this.m_tokens);
         this.m_index = 0;
         this.saved_index = 0;
         this.m_error = ParserErr.UNKNOWN;
@@ -159,6 +161,7 @@ public class Parser
 
     private Status ParseDirector()
     {
+        SkipTerminators();
         // Global Statements
         Status s = Status.Failure;
         SaveState();
@@ -167,6 +170,7 @@ public class Parser
         bool is_public = CurrentTkn().type == TknType.PubKeyword;
         if (is_public) Advance();
 
+        SkipTerminators();
 
         Token c = CurrentTkn(), n = NextTkn();
         switch (c.type)
@@ -182,11 +186,19 @@ public class Parser
 
     private Status ParseGlobalAfterIdentifier()
     {
-        Advance();
-        if (ExpectAndConsume(TknType.Colon) == Status.Failure) return Status.Failure;
-        if (ExpectAndConsume(TknType.Colon) == Status.Success)
-        { return ParseGlobalDefinition(); }
+        Advance(); // skips identifier
+        SkipTerminators();
 
+        // every global identifier requires a colon after it
+        if (ExpectAndConsume(TknType.Colon) == Status.Failure) return Status.Failure;
+
+        SkipTerminators();
+
+        // constant (2nd colon)
+        if (ExpectAndConsume(TknType.Colon) == Status.Success)
+            return ParseGlobalDefinition();
+
+        // NOTE: else parse type
         ParseType();
         Utilities.Todo("Handle Global Mutables & Unwanted Tokens");
         return Status.Failure;
@@ -194,6 +206,7 @@ public class Parser
 
     private Status ParseGlobalDefinition()
     {
+        SkipTerminators();
         switch (CurrentTkn().type)
         {
             case TknType.FnKeyword: return ParseFunctions();
@@ -201,6 +214,7 @@ public class Parser
             case TknType.RecordKeyword: return ParseRecords();
             case TknType.EnumKeyword: return ParseEnums();
             case TknType.VariantKeyword: return ParseVariants();
+
             default:
                 break;
         }
@@ -285,6 +299,11 @@ public class Parser
         return eql ? Status.Success : Status.Failure;
     }
 
+    private void SkipTerminators()
+    {
+        TknType curr = CurrentTkn().type;
+        if (curr == TknType.Terminator) Advance();
+    }
 
     private void SaveState() { saved_index = m_index; }
     private void RestoreState() { m_index = saved_index; }
