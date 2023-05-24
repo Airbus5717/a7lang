@@ -113,6 +113,15 @@ public class Err
         return result;
     }
 
+    private static string GetSpaces(int length)
+    {
+        int resLen = length;
+        string result = new StringBuilder(" ".Length * resLen)
+                            .Insert(0, " ", resLen)
+                            .ToString();
+        return result;
+    }
+
     public static void PrintStage(Stage s)
     {
         Utilities.Log(ConsoleColor.Magenta, "[STAGE]: ", GetStageString(s));
@@ -126,6 +135,13 @@ public class Err
         int length = c.length;
 
         string code_inline = parser.file.Substring(index, length);
+        int indexOfPrevLine = 0;
+        for (int i = index; i >= 0; i--)
+        {
+            indexOfPrevLine = i;
+            if (parser.m_ast.tokens[i].line != line) break;
+        }
+        int spaces = index - indexOfPrevLine;
 
         Console.ForegroundColor = ConsoleColor.Green;
         Console.Write("> File: {0}:{1}:", parser.filename, line);
@@ -141,12 +157,12 @@ public class Err
         Console.ResetColor();
         Console.Write("   | ");
         Console.ForegroundColor = ConsoleColor.Red;
-        // Console.WriteLine("{0}", arrows);
+        Console.WriteLine("{0}{1}", GetSpaces(spaces), GetArrows(length));
         Console.Write("> Advice: ");
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("{0}", GetParserErrString(parser.m_error));
         Console.ResetColor();
-        PrintStage(Stage.PARSER);
+        //        PrintStage(Stage.PARSER);
 #if DEBUG
         Utilities.PrintStackTrace();
 #endif

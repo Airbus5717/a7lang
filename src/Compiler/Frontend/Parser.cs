@@ -2,11 +2,41 @@ namespace A7.Frontend;
 
 using A7.Utils;
 
-public struct ValNode
+enum BinaryOP
 {
-
+    Add,
+    Sub,
+    // TODO: Add the rest of operations
+}
+enum UnaryOP
+{
+    Plus,
+    Negate_Logical,
+    Negate_Sign,
+    // TODO: Add the rest of operations
 }
 
+public interface ValNode
+{
+    // TODO:
+}
+
+public struct SingleValueNode : ValNode
+{
+    Token child_tkn_idx;
+}
+
+public struct BinaryValueNode : ValNode
+{
+    ValNode left, right;
+    BinaryOP op;
+}
+
+public struct UnaryValueNode : ValNode
+{
+    ValNode child;
+    UnaryOP op;
+}
 
 public struct Import
 {

@@ -2,6 +2,8 @@ namespace A7;
 using A7.Utils;
 using A7.Frontend;
 
+using CompileStatus = Pair<A7.Utils.Status, A7.Utils.Stage>;
+
 struct CompileOptions
 {
     public string path;
@@ -22,7 +24,7 @@ public class Pair<T, K>
 class Compiler
 {
 
-    public static Pair<Status, Stage> compile(CompileOptions opts)
+    public static CompileStatus compile(CompileOptions opts)
     {
         /*
             Compiling Stages
@@ -33,7 +35,7 @@ class Compiler
             5. Optimize (optional) -> partially Optimized Ast
             7. Backend Code generation -> output
         */
-        Pair<Status, Stage> status = new Pair<Status, Stage>();
+        CompileStatus status = new CompileStatus();
         status.item1 = Status.Failure;
 
         // STAGE: Read File

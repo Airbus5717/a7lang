@@ -14,7 +14,7 @@ public class TestLexer
     [Fact]
     public void TestDigitNumber()
     {
-        Token[] tkns = LexAString("12 1 1231_2342314 0234 0xab_c 0b1_0101");
+        Token[] tkns = LexAString("12 1 1231_2342314 0234 0b0101001010 0xab_c 0b1_0101");
 
         // didnt convert to loop due to EOT type tokens
         Assert.Equal(TknType.IntegerLiteral, tkns[0].type);
@@ -23,6 +23,7 @@ public class TestLexer
         Assert.Equal(TknType.IntegerLiteral, tkns[3].type);
         Assert.Equal(TknType.IntegerLiteral, tkns[4].type);
         Assert.Equal(TknType.IntegerLiteral, tkns[5].type);
+        Assert.Equal(TknType.IntegerLiteral, tkns[6].type);
     }
 
     [Fact]
