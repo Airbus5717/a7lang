@@ -205,7 +205,7 @@ public class Parser
         Token c = CurrentTkn(), n = NextTkn();
         switch (c.type)
         {
-            case TknType.Identifier: s = ParseGlobalAfterIdentifier(); break;
+            case TknType.Identifier: s = ParseGlobalConstantStatement(); break;
             case TknType.EOT: return Status.Done;
             default: break;
         }
@@ -214,7 +214,7 @@ public class Parser
     }
 
 
-    private Status ParseGlobalAfterIdentifier()
+    private Status ParseGlobalConstantStatement()
     {
         Advance(); // skips identifier
         SkipTerminators();
@@ -222,15 +222,28 @@ public class Parser
         // every global identifier requires a colon after it
         if (ExpectAndConsume(TknType.Colon) == Status.Failure) return Status.Failure;
 
-        SkipTerminators();
-
-        // constant (2nd colon)
+        // ::
+        //  ^--- 2nd colon
         if (ExpectAndConsume(TknType.Colon) == Status.Success)
             return ParseGlobalDefinition();
 
+        // :=
+        //  ^-- equal
+        if (ExpectAndConsume(TknType.Equal) == Status.Success)
+            return ParseGlobalExpression();
+
         // NOTE: else parse type
-        ParseType();
-        Utilities.Todo("Handle Global Mutables & Unwanted Tokens");
+        Optional<TypeIndex> type = ParseType();
+        if (ExpectAndConsume(TknType.Equal) == Status.Success)
+            return ParseGlobalExpression();
+
+        Utilities.Todo("Handle Unwanted Global Tokens");
+        return Status.Failure;
+    }
+
+    private Status ParseGlobalExpression()
+    {
+        Utilities.Todo("Handle Global Mutables");
         return Status.Failure;
     }
 

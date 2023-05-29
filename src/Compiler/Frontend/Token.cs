@@ -20,7 +20,7 @@ public struct Token
 
     public override string ToString()
     {
-        return "Token{index: " + index + ", length: " + length + ", line: " + line + "}";
+        return "Token{index: " + index + ", length: " + length + ", line: " + line + ", type: " + type + "}";
     }
 
     public bool Equals(Token token)

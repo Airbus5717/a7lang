@@ -105,10 +105,11 @@ public class Utilities
             [CallerMemberName] string member = "",
             [CallerLineNumber] int line = 0)
     {
+        var file_name = Path.GetFileName(file);
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("[TODO] : " + text);
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("file: {0}, line: {1}, method: {2}", file, line, member);
+        Console.WriteLine("file: {0}, line: {1}, method: {2}", file_name, line, member);
         Console.ResetColor();
         PrintStackTrace();
         Exit(1);
@@ -119,10 +120,11 @@ public class Utilities
             [CallerMemberName] string member = "",
             [CallerLineNumber] int line = 0)
     {
+        var file_name = Path.GetFileName(file);
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("[Unreachable] : reached unreachable state");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("file: {0}, line: {1}, method: {2}", file, line, member);
+        Console.WriteLine("file: {0}, line: {1}, method: {2}", file_name, line, member);
         Console.ResetColor();
         PrintStackTrace();
         Exit(1);

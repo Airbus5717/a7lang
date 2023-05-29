@@ -53,6 +53,7 @@ class Compiler
             return status;
 
 #if DEBUG
+        // TODO: seperate debug compiling for each stage
         DebugCompile(ref lexer); // only at debug builds
 #endif
         // STAGE: Parse Tokens
@@ -82,7 +83,7 @@ class Compiler
             Utils.Err.PrintStage(Stage.LEXER);
             foreach (Token i in l.GetTokens())
             {
-                Console.WriteLine("[Token]: idx: {0}, len: {1}, type: {2}", i.index, i.length, i.type);
+                Console.WriteLine(i.ToString());
                 if (i.type == TknType.EOT) break;
             }
             Utils.Err.PrintStage(Stage.PARSER);

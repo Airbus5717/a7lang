@@ -12,6 +12,12 @@ public struct Optional<T>
         }
     }
 
+
+    public Optional()
+    {
+        this.HasValue = false;
+    }
+
     public Optional(T value)
     {
         this.value = value;
