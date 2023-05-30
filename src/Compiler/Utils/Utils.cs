@@ -88,6 +88,9 @@ public class Utilities
          * prepended with a newline char
          * to simplify the lexical analysis
          * */
+
+        // string gets appended with newline char then appended again with
+        // NULL_COUNT of zeroed chars
         string res = s + '\n' + new string(padding);
         return res;
     }

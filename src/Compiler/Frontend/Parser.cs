@@ -2,15 +2,27 @@ namespace A7.Frontend;
 
 using A7.Utils;
 
-enum BinaryOP
+enum BinaryOP : byte
 {
     Add,
     Sub,
+    Multiply,
+    Divide,
+
+    Shift_Left,
+    Shift_Right,
+
+    Bitwise_And,
+    Bitwise_Or,
+    Bitwise_Xor,
+
+    Logical_Or,
+    Logical_And,
     // TODO: Add the rest of operations
 }
-enum UnaryOP
+enum UnaryOP : byte
 {
-    Plus,
+    Plus_Operator,
     Negate_Logical,
     Negate_Sign,
     // TODO: Add the rest of operations
@@ -121,6 +133,7 @@ public struct Ast
     public List<Function> functions { get; private set; }
     public List<Record> records { get; private set; }
     public List<Enum> enums { get; private set; }
+    public List<VariableDef> gl_vars { get; private set; }
 
     public Ast(ref Token[] tkns)
     {
@@ -131,9 +144,9 @@ public struct Ast
         this.enums = new List<Enum>();
     }
 
-    public void AddImport(int id_index, int str_index)
+    public void AddImport(int id_token_index, int str_token_index)
     {
-        imports.Add(new Import(id_index, str_index));
+        imports.Add(new Import(id_token_index, str_token_index));
     }
 
     public void AddFunction(Function fn)
@@ -141,7 +154,20 @@ public struct Ast
         functions.Add(fn);
     }
 
-    public void AddRecord() { }
+    public void AddRecord(Record r)
+    {
+        records.Add(r);
+    }
+
+    public void AddEnum(Enum e)
+    {
+        enums.Add(e);
+    }
+
+    public void AddGlobalVariable(VariableDef v)
+    {
+        gl_vars.Add(v);
+    }
 }
 
 
@@ -205,7 +231,7 @@ public class Parser
         Token c = CurrentTkn(), n = NextTkn();
         switch (c.type)
         {
-            case TknType.Identifier: s = ParseGlobalConstantStatement(); break;
+            case TknType.Identifier: s = ParseGlobalConstantStatement(is_public); break;
             case TknType.EOT: return Status.Done;
             default: break;
         }
@@ -214,7 +240,7 @@ public class Parser
     }
 
 
-    private Status ParseGlobalConstantStatement()
+    private Status ParseGlobalConstantStatement(bool is_public)
     {
         Advance(); // skips identifier
         SkipTerminators();
@@ -225,7 +251,7 @@ public class Parser
         // ::
         //  ^--- 2nd colon
         if (ExpectAndConsume(TknType.Colon) == Status.Success)
-            return ParseGlobalDefinition();
+            return ParseGlobalDefinition(is_public);
 
         // :=
         //  ^-- equal
@@ -247,7 +273,7 @@ public class Parser
         return Status.Failure;
     }
 
-    private Status ParseGlobalDefinition()
+    private Status ParseGlobalDefinition(bool is_public)
     {
         SkipTerminators();
         switch (CurrentTkn().type)

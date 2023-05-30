@@ -97,21 +97,19 @@ public class Lexer
         if (Char.IsAsciiLetter(c) || c == '_')
             return LexIdentifier();
 
-        if (c == '"')
-            return LexString();
-
-        if (c == '\'')
-            return LexChar();
-
-        if (c == '`')
-            return LexMultiLineString();
-
-        if (c == '@')
-            return LexBuiltin();
-
         m_length++; // to simplify the code
+
         switch (c)
         {
+            case '"': return LexString();
+            case '\'': return LexChar();
+            case '`': return LexMultiLineString();
+            case '@': return LexBuiltin();
+            /*
+             * NOTE(5717): the code below won't increment the index, but rather only the
+             * length to remove the need to restore indexes during adding the token
+             * to the list during AddToken function call
+            */
             case '{': return AddToken(TknType.OpenCurly);
             case '}': return AddToken(TknType.CloseCurly);
             case '(': return AddToken(TknType.OpenParen);
@@ -283,30 +281,6 @@ public class Lexer
 
     private Status LexNumeric()
     {
-        // 2 small util functions in LexNumeric
-        Status LexHexIntLiteral()
-        {
-            AdvanceWithLength(); // '0'
-            AdvanceWithLength(); // 'x'
-            while (Char.IsAsciiHexDigit(CurrentChar()) || CurrentChar() == '_')
-                AdvanceWithLength();
-
-            if (m_length > MAX_LENGTH_INT_HEX)
-            { m_error = LexerErr.NUM_TOO_LONG; return Status.Failure; }
-            return AddToken(TknType.IntegerLiteral);
-        }
-
-        Status LexBinaryIntLiteral()
-        {
-            AdvanceWithLength(); // '0'
-            AdvanceWithLength(); // 'b'
-            for (char c = CurrentChar(); c == '0' || c == '1' || c == '_'; c = CurrentChar())
-                AdvanceWithLength();
-
-            if (m_length > MAX_LENGTH_INT_BINARY)
-            { m_error = LexerErr.NUM_TOO_LONG; return Status.Failure; }
-            return AddToken(TknType.IntegerLiteral);
-        }
 
         char c = CurrentChar(), n = NextChar();
 
@@ -323,6 +297,8 @@ public class Lexer
 
         bool reached_dot = false;
         AdvanceWithLength();
+
+        // TODO(5717): remove extra period('.') checks
         while (Char.IsAsciiDigit(CurrentChar()) || CurrentChar() == '.' || CurrentChar() == '_')
         {
             AdvanceWithLength();
@@ -341,10 +317,38 @@ public class Lexer
         return AddToken(reached_dot ? TknType.FloatLiteral : TknType.IntegerLiteral);
     }
 
+    // 2 small util functions in LexNumeric
+    Status LexHexIntLiteral()
+    {
+        AdvanceWithLength(); // '0'
+        AdvanceWithLength(); // 'x'
+        while (Char.IsAsciiHexDigit(CurrentChar()) || CurrentChar() == '_')
+            AdvanceWithLength();
+
+        if (m_length > MAX_LENGTH_INT_HEX)
+        { m_error = LexerErr.NUM_TOO_LONG; return Status.Failure; }
+        RestoreIndex();
+        return AddToken(TknType.IntegerLiteral);
+    }
+
+    Status LexBinaryIntLiteral()
+    {
+        AdvanceWithLength(); // '0'
+        AdvanceWithLength(); // 'b'
+        while (IsCurrentABinaryCharOrUnderScore())
+            AdvanceWithLength();
+
+        if (m_length > MAX_LENGTH_INT_BINARY)
+        { m_error = LexerErr.NUM_TOO_LONG; return Status.Failure; }
+        RestoreIndex();
+        return AddToken(TknType.IntegerLiteral);
+    }
+
+
 
     private Status LexBuiltin()
     {
-        AdvanceWithLength(); // '@'
+        Advance(); // skip '@', length is already 1
 
         while (Char.IsAsciiLetter(CurrentChar()) || CurrentChar() == '_')
         {
@@ -381,7 +385,7 @@ public class Lexer
 
     private Status LexChar()
     {
-        AdvanceWithLength();
+        Advance(); // skip ', length is already 1
         if (CurrentChar() != '\\' && NextChar() == '\'')
         {
             AdvanceWithLength();
@@ -417,7 +421,7 @@ public class Lexer
 
     private Status LexString()
     {
-        AdvanceWithLength();
+        Advance(); // skip '"', length is already 1
         while (true)
         {
             char c = CurrentChar();
@@ -457,7 +461,7 @@ public class Lexer
 
     private Status LexMultiLineString()
     {
-        AdvanceWithLength();
+        Advance(); // skip `, length is already 1
         while (true)
         {
             char c = CurrentChar();
@@ -563,6 +567,13 @@ public class Lexer
     private char CurrentChar() { return m_file[m_index]; }
     private char NextChar() { return m_file[(m_index + 1)]; }
     private char PrevChar() { return m_file[(m_index - 1)]; }
+
+    private bool IsCurrentABinaryCharOrUnderScore()
+    {
+        char c = CurrentChar();
+        return (c == '0' || c == '1' || c == '_');
+    }
+
     // is not end of file
     private bool IsNotEOF()
     {
