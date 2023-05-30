@@ -276,17 +276,24 @@ public class Parser
     private Status ParseGlobalDefinition(bool is_public)
     {
         SkipTerminators();
-        switch (CurrentTkn().type)
+        if (is_public)
         {
-            case TknType.FnKeyword: return ParseFunctions();
-            case TknType.ImportKeyword: return ParseImports();
-            case TknType.RecordKeyword: return ParseRecords();
-            case TknType.EnumKeyword: return ParseEnums();
-            case TknType.VariantKeyword: return ParseVariants();
-
-            default:
-                break;
+            switch (CurrentTkn().type)
+            {
+                case TknType.FnKeyword: return ParseFunctions();
+                case TknType.RecordKeyword: return ParseRecords();
+                case TknType.EnumKeyword: return ParseEnums();
+                case TknType.VariantKeyword: return ParseVariants();
+                default:
+                    break;
+            }
         }
+        else
+        {
+            if (CurrentTkn().type == TknType.ImportKeyword)
+                return ParseImports();
+        }
+
         Utilities.Todo("Handle Global Constants");
         return Status.Failure;
     }

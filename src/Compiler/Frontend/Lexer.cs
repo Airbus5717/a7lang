@@ -538,7 +538,7 @@ public class Lexer
     {
         // NOTE: No need to add duplicate terminators
         // if the previous token is already a terminator
-        if (m_tokens.Last().type != TknType.Terminator)
+        if (m_tokens.LongCount() > 0 && m_tokens.Last().type != TknType.Terminator)
             AddToken(TknType.Terminator);
     }
 
