@@ -64,6 +64,8 @@ public class TestLexer
         Assert.Equal(TknType.StringLiteral, tkns[1].type);
     }
 
+
+    // NOTE(5717): Helper method
     private Token[] LexAString(string input, [CallerMemberName] string member = "")
     {
         string s = Utilities.PrepareStrForParsing(input);

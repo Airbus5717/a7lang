@@ -103,7 +103,7 @@ public enum TknType : byte
     RecordKeyword, // 'record' basically struct
     DeferKeyword, // 'defer' cleanup at end of scope
     VariantKeyword, // 'variant' basically tagged union
-    RefKeyword, // 'ref' // TODO later
+    RefKeyword, // 'ref' pointer type
     NilLiteral, // `nil` basically null
     EOT, // END OF TOKENS (last token type in list)
 

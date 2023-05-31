@@ -528,7 +528,6 @@ public class Lexer
             {
                 m_line++;
                 AddTerminator();
-                Advance();
             }
             else { break; }
         }
@@ -540,6 +539,8 @@ public class Lexer
         // if the previous token is already a terminator
         if (m_tokens.LongCount() > 0 && m_tokens.Last().type != TknType.Terminator)
             AddToken(TknType.Terminator);
+        else
+            Advance();
     }
 
     private void Advance() { ++m_index; }

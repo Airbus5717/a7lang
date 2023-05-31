@@ -35,20 +35,38 @@ public interface ValNode
 
 public struct SingleValueNode : ValNode
 {
-    Token child_tkn_idx;
+    Token child_tkn_idx { get; set; }
 }
 
 public struct BinaryValueNode : ValNode
 {
-    ValNode left, right;
-    BinaryOP op;
+    ValNode left { get; set; }
+    ValNode right { get; set; }
+    BinaryOP op { get; set; }
 }
 
 public struct UnaryValueNode : ValNode
 {
-    ValNode child;
-    UnaryOP op;
+    ValNode child { get; set; }
+    UnaryOP op { get; set; }
 }
+
+
+public interface Statement
+{
+
+}
+
+public interface FunctionCallStmt : Statement
+{
+
+}
+
+public struct CodeBlock
+{
+    List<Statement> statements { get; set; }
+}
+
 
 public struct Import
 {
@@ -65,18 +83,20 @@ public struct Import
 public struct Function
 {
     public FunctionType type { get; }
+    public CodeBlock block { get; }
 
-    public Function(FunctionType ftype)
+    public Function(FunctionType ftype, CodeBlock block)
     {
         type = ftype;
+        this.block = block;
     }
 }
 
 public struct VariableDef
 {
-    int id_token_index { get; }
-    TypeIndex type { get; }
-    Optional<ValNode> value;
+    public int id_token_index { get; }
+    public TypeIndex type { get; set; }
+    public Optional<ValNode> value;
 
     public VariableDef(int id_token_index, TypeIndex type)
     {
@@ -285,23 +305,56 @@ public class Parser
                 case TknType.EnumKeyword: return ParseEnums();
                 case TknType.VariantKeyword: return ParseVariants();
                 default:
+                    Utilities.Todo("Handle Global public tokens");
                     break;
             }
         }
         else
         {
-            if (CurrentTkn().type == TknType.ImportKeyword)
-                return ParseImports();
+            switch (CurrentTkn().type)
+            {
+                case TknType.FnKeyword: return ParseFunctions();
+                case TknType.RecordKeyword: return ParseRecords();
+                case TknType.ImportKeyword: return ParseImports();
+                case TknType.EnumKeyword: return ParseEnums();
+                case TknType.VariantKeyword: return ParseVariants();
+                default:
+                    Utilities.Todo("Handle Global public tokens");
+                    break;
+            }
         }
 
         Utilities.Todo("Handle Global Constants");
         return Status.Failure;
     }
 
-    private Optional<TypeIndex> ParseType()
+    private TypeIndex ParseType()
     {
-        Utilities.Todo("Parse Types");
-        return new Optional<TypeIndex>();
+        var type = new TypeIndex();
+        switch (CurrentTkn().type)
+        {
+            case TknType.IntKeyword: type.kind = TypeBaseKind.Int; break;
+            case TknType.UIntKeyword: type.kind = TypeBaseKind.UInt; break;
+            case TknType.FltKeyword: type.kind = TypeBaseKind.Float; break;
+            case TknType.CharKeyword: type.kind = TypeBaseKind.Char; break;
+            case TknType.BoolKeyword: type.kind = TypeBaseKind.Bool; break;
+            case TknType.OpenCurly: break;
+            case TknType.Comma: break;
+            case TknType.OpenParen: break;
+            case TknType.Equal: break;
+            case TknType.CloseCurly: break;
+            case TknType.CloseParen: break;
+            case TknType.CloseSQRBrackets: break;
+            case TknType.Terminator: break;
+            default:
+#if DEBUG
+                Utilities.LogDebug(CurrentTkn().ToString());
+#endif
+                Utilities.Todo("implement type parser for this token");
+                break;
+
+        }
+        return type;
     }
 
     private Status ParseRecords()
@@ -334,8 +387,49 @@ public class Parser
          * id :: fn(arg1: type1, ...) return_type { ... }
          */
         Advance(); // skip 'fn'
-        Utilities.Todo("Parse Functions");
-        return Status.Failure;
+        if (ExpectAndConsume(TknType.OpenParen) == Status.Failure) return Status.Failure;
+        List<VariableDef> args = ParseFunctionArguments();
+        if (ExpectAndConsume(TknType.CloseParen) == Status.Failure) return Status.Failure;
+        TypeIndex return_type = ParseType(); // Parse Type Until a delimiter which is '{'
+
+        if (ExpectAndConsume(TknType.OpenCurly) == Status.Failure) return Status.Failure;
+        else
+        {
+            Utilities.Todo("Handle Function definitions without impl");
+        }
+
+        CodeBlock blk = ParseCodeBlock();
+
+        if (ExpectAndConsume(TknType.CloseCurly) == Status.Failure) return Status.Failure;
+
+        m_ast.AddFunction(new Function(new FunctionType(args, return_type), blk));
+        return Status.Success;
+    }
+
+    private CodeBlock ParseCodeBlock()
+    {
+        var blk = new CodeBlock();
+        while (true)
+        {
+            // TODO:
+            break;
+        }
+        return blk;
+    }
+
+    private List<VariableDef> ParseFunctionArguments()
+    {
+        var c = CurrentTkn();
+        List<VariableDef> list = new List<VariableDef>();
+        while (true)
+        {
+            if (c.type == TknType.CloseParen) break;
+            else
+            {
+                Utilities.Todo("implement Parse function arguments");
+            }
+        }
+        return list;
     }
 
     private Status ParseImports()
