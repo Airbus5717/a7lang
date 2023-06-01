@@ -6,11 +6,6 @@ using A7.Utils;
     NOTE: Terminator: is a newline or semicolon
 */
 
-/*
-TODO List:
-    - Multiline comments
-*/
-
 public class Lexer
 {
     // NOTE: These are not the final length check
