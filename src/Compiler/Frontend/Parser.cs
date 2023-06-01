@@ -31,11 +31,16 @@ enum UnaryOP : byte
 public interface ValNode
 {
     // TODO:
+    //
+    string ToString()
+    {
+        return "ValNode";
+    }
 }
 
 public struct SingleValueNode : ValNode
 {
-    Token child_tkn_idx { get; set; }
+    Token child_tkn { get; set; }
 }
 
 public struct BinaryValueNode : ValNode
@@ -57,7 +62,27 @@ public interface Statement
 
 }
 
-public interface FunctionCallStmt : Statement
+public struct IfTrue : Statement
+{
+    ValNode branch_condition { get; set; }
+    CodeBlock true_branch { get; set; }
+}
+
+public struct DeclVariable : Statement
+{
+    bool is_const { get; set; }
+    Token id { get; set; }
+    TypeIndex type { get; set; }
+    ValNode value { get; set; }
+}
+
+public struct MutateVariable : Statement
+{
+    ValNode new_val { get; set; }
+    Token id { get; set; }
+}
+
+public struct FunctionCallStmt : Statement
 {
 
 }
@@ -286,9 +311,16 @@ public class Parser
             return ParseGlobalExpression();
 
         // NOTE: else parse type
-        Optional<TypeIndex> type = ParseType();
+        // TODO: FIXME: deal with
+        // id : type =
+        // id : type :
+        Utilities.Todo("Deal with parse type for written type");
+        Optional<TypeIndex> type = ParseType(TknType.Equal);
         if (ExpectAndConsume(TknType.Equal) == Status.Success)
             return ParseGlobalExpression();
+
+        if (ExpectAndConsume(TknType.Colon) == Status.Success)
+            return ParseGlobalDefinition(is_public);
 
         Utilities.Todo("Handle Unwanted Global Tokens");
         return Status.Failure;
@@ -338,10 +370,12 @@ public class Parser
         return Status.Failure;
     }
 
-    private TypeIndex ParseType()
+    private TypeIndex ParseType(TknType t)
     {
         var type = new TypeIndex();
-        switch (CurrentTkn().type)
+        var current_type = CurrentTkn().type;
+        if (current_type == t) return type;
+        switch (current_type)
         {
             case TknType.IntKeyword: type.kind = TypeBaseKind.Int; break;
             case TknType.UIntKeyword: type.kind = TypeBaseKind.UInt; break;
@@ -401,7 +435,7 @@ public class Parser
         if (ExpectAndConsume(TknType.OpenParen, ParserErr.FN_EXPECT_OPEN_PARENTHESES) == Status.Failure) return Status.Failure;
         List<VariableDef> args = ParseFunctionArguments();
         if (ExpectAndConsume(TknType.CloseParen, ParserErr.FN_EXPECT_CLOSE_PARENTHESES) == Status.Failure) return Status.Failure;
-        TypeIndex return_type = ParseType(); // Parse Type Until a delimiter which is '{'
+        TypeIndex return_type = ParseType(TknType.OpenCurly); // Parse Type Until a delimiter which is '{'
 
         if (ExpectAndConsume(TknType.OpenCurly, ParserErr.FN_EXPECT_BODY) == Status.Failure)
         {

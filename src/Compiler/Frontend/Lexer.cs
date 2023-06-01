@@ -234,11 +234,11 @@ public class Lexer
                             Advance();
                         return Status.Success;
                     }
-                    // TODO: Implement Multiline comments
-                    // else if (p == '*')
-                    // {
-                    //     return LexMultiLineComments();
-                    // }
+                    else if (n == '*')
+                    {
+                        // TODO: Implement Multiline comments
+                        return LexMultiLineComments();
+                    }
 
                     // '/'
                     return AddToken(TknType.DivOperator);
@@ -495,27 +495,33 @@ public class Lexer
     }
 
 
-    // Status LexMultiLineComments()
-    // { This Code contains bugs
-    //     Utilities.Todo("implement Lex Multi line comments; Nested comments too");
-    //     Advance(); // '/'
-    //     Advance(); // '*'
-    //     uint deepness = 1;
-    //     char c = CurrentChar(), n = PeekChar();
-    //     while (true)
-    //     {
-    //         if (c == '/' && n == '*') { deepness++; Advance(); Advance(); }
-    //         if (c == '*' && n == '/') { deepness--; Advance(); Advance(); }
-    //         // update
-    //         Advance();
-    //         c = n;
-    //         n = PeekChar();
-    //         if (deepness == 0) break;
-    //         if (n == char.MinValue) break;
-    //     }
-    //     Advance();
-    //     return deepness == 0 ? Status.Success : Status.Failure;
-    // }
+    Status LexMultiLineComments()
+    {
+        // Utilities.Todo("implement Lex Multi line comments; Nested comments too");
+        Advance(); // '/'
+        Advance(); // '*'
+        uint deepness = 1;
+        char c = CurrentChar(), n = NextChar();
+        while (true)
+        {
+            if (c == '/' && n == '*') { deepness++; Advance(); Advance(); }
+            if (c == '*' && n == '/') { deepness--; Advance(); Advance(); }
+            // update
+            Advance();
+            c = CurrentChar();
+            n = NextChar();
+
+            if (deepness == 0) break;
+
+            // NOTE: This allows the multiline comment 
+            // comment to the end of the file without the
+            // need for ending delimiters
+            if (n == char.MinValue) break;
+        }
+
+        m_error = LexerErr.INVALID_MULTI_LINE_COMMENT;
+        return deepness == 0 ? Status.Success : Status.Failure;
+    }
 
     private void SkipWhitespace()
     {

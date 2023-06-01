@@ -15,6 +15,7 @@ public enum LexerErr
     BUILTIN_ID_TOO_LONG,
     NOT_VALID_ESC_CHAR,
     INVALID_CHAR_LITERAL,
+    INVALID_MULTI_LINE_COMMENT,
 }
 
 public enum ParserErr
