@@ -499,8 +499,8 @@ public class Lexer
         char c = CurrentChar(), n = NextChar();
         while (true)
         {
-            if (c == '/' && n == '*') { deepness++; Advance(); Advance(); }
-            if (c == '*' && n == '/') { deepness--; Advance(); Advance(); }
+            if (c == '/' && n == '*') { deepness++; Advance(); }// Advance(); }
+            if (c == '*' && n == '/') { deepness--; Advance(); }
             // update
             Advance();
             c = CurrentChar();
