@@ -20,8 +20,22 @@ public enum LexerErr
 public enum ParserErr
 {
     UNKNOWN,
+
+    // Global general
+    GLOBAL_TOKEN_NOT_ALLOWED,
+    EXPECT_GLOBAL_COLON_AFTER_ID,
+
+    // import statements
     IMPORT_EXPECT_STRING,
     IMPORT_EXPECT_TERMINATOR,
+
+    // Functions
+    FN_EXPECT_OPEN_PARENTHESES,
+    FN_EXPECT_CLOSE_PARENTHESES,
+    FN_EXPECT_BODY,
+    FN_EXPECT_END_CLOSE_CURLY,
+
+
 }
 
 public enum Stage
@@ -174,6 +188,14 @@ public class Err
         switch (value)
         {
             case ParserErr.UNKNOWN: return "Unknown";
+            case ParserErr.GLOBAL_TOKEN_NOT_ALLOWED: return "Not allowed in global context";
+            case ParserErr.EXPECT_GLOBAL_COLON_AFTER_ID: return "Expected a colon after global identifier";
+            case ParserErr.IMPORT_EXPECT_STRING: return "Expected an import string path";
+            case ParserErr.IMPORT_EXPECT_TERMINATOR: return "Excepted a semicolon end of import statement";
+            case ParserErr.FN_EXPECT_OPEN_PARENTHESES: return "Expected open paretheses for encapsulating function parameters";
+            case ParserErr.FN_EXPECT_CLOSE_PARENTHESES: return "Expected close paretheses for end of encapsulation of function parameters";
+            case ParserErr.FN_EXPECT_END_CLOSE_CURLY: return "Expected close curly bracked for end of the function";
+            case ParserErr.FN_EXPECT_BODY: return "Function definition expects a code block body";
         }
 
         Utilities.Todo("implement convert to string for parser errors");

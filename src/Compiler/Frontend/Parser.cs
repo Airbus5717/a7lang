@@ -273,7 +273,7 @@ public class Parser
         SkipTerminators();
 
         // every global identifier requires a colon after it
-        if (ExpectAndConsume(TknType.Colon) == Status.Failure) return Status.Failure;
+        if (ExpectAndConsume(TknType.Colon, ParserErr.EXPECT_GLOBAL_COLON_AFTER_ID) == Status.Failure) return Status.Failure;
 
         // ::
         //  ^--- 2nd colon
@@ -296,6 +296,8 @@ public class Parser
 
     private Status ParseGlobalExpression()
     {
+        // NOTE: For Global Variables
+        // not allowed to require runtime related computing
         Utilities.Todo("Handle Global Mutables");
         return Status.Failure;
     }
@@ -305,6 +307,7 @@ public class Parser
         SkipTerminators();
         if (is_public)
         {
+            // NOTE: maybe forgive public imports?
             switch (CurrentTkn().type)
             {
                 case TknType.FnKeyword: return ParseFunctions();
@@ -345,19 +348,20 @@ public class Parser
             case TknType.FltKeyword: type.kind = TypeBaseKind.Float; break;
             case TknType.CharKeyword: type.kind = TypeBaseKind.Char; break;
             case TknType.BoolKeyword: type.kind = TypeBaseKind.Bool; break;
-            case TknType.OpenCurly: break;
-            case TknType.Comma: break;
-            case TknType.OpenParen: break;
-            case TknType.Equal: break;
-            case TknType.CloseCurly: break;
-            case TknType.CloseParen: break;
-            case TknType.CloseSQRBrackets: break;
-            case TknType.Terminator: break;
+            case TknType.Identifier: Utilities.Todo("Parse record,variant,enum types & custom types"); break;
+            case TknType.OpenSQRBrackets: Utilities.Todo("Parse Array types"); break;
+            // case TknType.OpenCurly: break;
+            // case TknType.Comma: break;
+            // case TknType.OpenParen: break;
+            // case TknType.Equal: break;
+            // case TknType.CloseCurly: break;
+            // case TknType.CloseParen: break;
+            // case TknType.CloseSQRBrackets: break;
+            // case TknType.Terminator: break;
             default:
 #if DEBUG
-                Utilities.LogDebug(CurrentTkn().ToString());
+                Utilities.LogDebug("Parse invalid Type with token type: " + CurrentTkn().type);
 #endif
-                Utilities.Todo("implement type parser for this token" + CurrentTkn().ToString());
                 break;
 
         }
@@ -394,12 +398,12 @@ public class Parser
          * id :: fn(arg1: type1, ...) return_type { ... }
          */
         Advance(); // skip 'fn'
-        if (ExpectAndConsume(TknType.OpenParen) == Status.Failure) return Status.Failure;
+        if (ExpectAndConsume(TknType.OpenParen, ParserErr.FN_EXPECT_OPEN_PARENTHESES) == Status.Failure) return Status.Failure;
         List<VariableDef> args = ParseFunctionArguments();
-        if (ExpectAndConsume(TknType.CloseParen) == Status.Failure) return Status.Failure;
+        if (ExpectAndConsume(TknType.CloseParen, ParserErr.FN_EXPECT_CLOSE_PARENTHESES) == Status.Failure) return Status.Failure;
         TypeIndex return_type = ParseType(); // Parse Type Until a delimiter which is '{'
 
-        if (ExpectAndConsume(TknType.OpenCurly) == Status.Failure)
+        if (ExpectAndConsume(TknType.OpenCurly, ParserErr.FN_EXPECT_BODY) == Status.Failure)
         {
             Utilities.Todo("Handle Function definitions without impl");
             return Status.Failure;
@@ -407,7 +411,7 @@ public class Parser
 
         CodeBlock blk = ParseCodeBlock();
 
-        if (ExpectAndConsume(TknType.CloseCurly) == Status.Failure) return Status.Failure;
+        if (ExpectAndConsume(TknType.CloseCurly, ParserErr.FN_EXPECT_END_CLOSE_CURLY) == Status.Failure) return Status.Failure;
 
         m_ast.AddFunction(new FunctionType(args, return_type), blk);
         return Status.Success;
