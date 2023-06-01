@@ -154,6 +154,7 @@ public struct Ast
     public List<Record> records { get; private set; }
     public List<Enum> enums { get; private set; }
     public List<VariableDef> gl_vars { get; private set; }
+    public List<Variant> variants { get; private set; }
 
     public Ast(ref Token[] tkns)
     {
@@ -162,6 +163,7 @@ public struct Ast
         this.functions = new List<Function>();
         this.records = new List<Record>();
         this.enums = new List<Enum>();
+        this.variants = new List<Variant>();
     }
 
     public void AddImport(int id_token_index, int str_token_index)
@@ -169,24 +171,29 @@ public struct Ast
         imports.Add(new Import(id_token_index, str_token_index));
     }
 
-    public void AddFunction(Function fn)
+    public void AddFunction(FunctionType ftype, CodeBlock block)
     {
-        functions.Add(fn);
+        functions.Add(new Function(ftype, block));
     }
 
-    public void AddRecord(Record r)
+    public void AddRecord(int id_token_index, List<VariableDef> children)
     {
-        records.Add(r);
+        records.Add(new Record(id_token_index, children));
     }
 
-    public void AddEnum(Enum e)
+    public void AddEnum(int id_token_index, List<Token> children_id)
     {
-        enums.Add(e);
+        enums.Add(new Enum(id_token_index, children_id));
     }
 
-    public void AddGlobalVariable(VariableDef v)
+    public void AddGlobalVariable(int id_token_index, TypeIndex type)
     {
-        gl_vars.Add(v);
+        gl_vars.Add(new VariableDef(id_token_index, type));
+    }
+
+    public void AddVariant(int id_token_index, List<VariableDef> children)
+    {
+        variants.Add(new Variant(id_token_index, children));
     }
 }
 
@@ -350,7 +357,7 @@ public class Parser
 #if DEBUG
                 Utilities.LogDebug(CurrentTkn().ToString());
 #endif
-                Utilities.Todo("implement type parser for this token");
+                Utilities.Todo("implement type parser for this token" + CurrentTkn().ToString());
                 break;
 
         }
@@ -392,23 +399,24 @@ public class Parser
         if (ExpectAndConsume(TknType.CloseParen) == Status.Failure) return Status.Failure;
         TypeIndex return_type = ParseType(); // Parse Type Until a delimiter which is '{'
 
-        if (ExpectAndConsume(TknType.OpenCurly) == Status.Failure) return Status.Failure;
-        else
+        if (ExpectAndConsume(TknType.OpenCurly) == Status.Failure)
         {
             Utilities.Todo("Handle Function definitions without impl");
+            return Status.Failure;
         }
 
         CodeBlock blk = ParseCodeBlock();
 
         if (ExpectAndConsume(TknType.CloseCurly) == Status.Failure) return Status.Failure;
 
-        m_ast.AddFunction(new Function(new FunctionType(args, return_type), blk));
+        m_ast.AddFunction(new FunctionType(args, return_type), blk);
         return Status.Success;
     }
 
     private CodeBlock ParseCodeBlock()
     {
         var blk = new CodeBlock();
+        Utilities.Todo("Parse Code Blocks");
         while (true)
         {
             // TODO:

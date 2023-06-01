@@ -526,8 +526,8 @@ public class Lexer
             if (c == ' ' || c == '\t') { Advance(); }
             else if (c == '\n')
             {
-                m_line++;
                 AddTerminator();
+                m_line++;
             }
             else { break; }
         }
