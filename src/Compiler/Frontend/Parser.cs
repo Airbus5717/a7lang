@@ -173,7 +173,7 @@ public struct Enum
 
 public struct Ast
 {
-    public Token[] tokens { get; }
+    public readonly Token[] tokens;
     public List<Import> imports { get; private set; }
     public List<Function> functions { get; private set; }
     public List<Record> records { get; private set; }
@@ -226,21 +226,25 @@ public struct Ast
 public class Parser
 {
     private readonly Token[] m_tokens;
-    private int m_index;
-    private int saved_index;
+    public readonly string filename;
+    public readonly string file;
 
     public Ast m_ast { get; private set; }
-    public string filename { get; }
-    public string file { get; }
+
+    private int m_index;
+    private int saved_index;
 
     public ParserErr m_error { get; set; } = ParserErr.UNKNOWN;
 
     public Parser(ref Lexer _lexer)
     {
+        // readonly
         this.filename = _lexer.filename;
         this.file = _lexer.m_file;
         this.m_tokens = _lexer.GetTokens();
+
         this.m_ast = new Ast(ref this.m_tokens);
+
         this.m_index = 0;
         this.saved_index = 0;
         this.m_error = ParserErr.UNKNOWN;

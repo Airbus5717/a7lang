@@ -65,6 +65,7 @@ public class Err
             case LexerErr.BUILTIN_ID_TOO_LONG: return "Builtin Identifier is too long";
             case LexerErr.NOT_VALID_ESC_CHAR: return "Not a valid escape char";
             case LexerErr.INVALID_CHAR_LITERAL: return "Char literal is too long";
+            case LexerErr.INVALID_MULTI_LINE_COMMENT: return "Multi line nested comment is not closed with end of comment delimiter";
             default: break;
         }
         Utilities.Todo("Add an Error string for " + kind.ToString());
@@ -114,7 +115,7 @@ public class Err
         Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("{0}", GetLexerErrString(l.GetErr()));
         Console.ResetColor();
-        PrintStage(Stage.LEXER);
+        // PrintStage(Stage.LEXER);
     }
 
     private static string GetArrows(int length)

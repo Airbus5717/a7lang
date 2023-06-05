@@ -231,7 +231,6 @@ public class Lexer
                     }
                     else if (n == '*')
                     {
-                        // TODO: Implement Multiline comments
                         return LexMultiLineComments();
                     }
 
@@ -492,14 +491,15 @@ public class Lexer
 
     Status LexMultiLineComments()
     {
-        // Utilities.Todo("implement Lex Multi line comments; Nested comments too");
+        m_length = 2;
         Advance(); // '/'
         Advance(); // '*'
         uint deepness = 1;
         char c = CurrentChar(), n = NextChar();
+
         while (true)
         {
-            if (c == '/' && n == '*') { deepness++; Advance(); }// Advance(); }
+            if (c == '/' && n == '*') { deepness++; Advance(); }
             if (c == '*' && n == '/') { deepness--; Advance(); }
             // update
             Advance();
