@@ -1,6 +1,7 @@
 namespace A7.Frontend;
 
 using A7.Utils;
+using Xunit;
 
 enum BinaryOP : byte
 {
@@ -20,6 +21,7 @@ enum BinaryOP : byte
     Logical_And,
     // TODO: Add the rest of operations
 }
+
 enum UnaryOP : byte
 {
     Plus_Operator,
@@ -62,6 +64,12 @@ public interface Statement
 
 }
 
+public struct InvalidStatement : Statement
+{
+
+}
+
+
 public struct IfTrue : Statement
 {
     ValNode branch_condition { get; set; }
@@ -89,7 +97,7 @@ public struct FunctionCallStmt : Statement
 
 public struct CodeBlock
 {
-    List<Statement> statements { get; set; }
+    public List<Statement> statements { get; set; }
 }
 
 
@@ -461,16 +469,25 @@ public class Parser
         Utilities.Todo("Parse Code Blocks");
         while (true)
         {
-            // TODO:
+            Statement stmt = ParseLocalStatement();
+            Utilities.Todo("check statements");
+            blk.statements.Add(stmt);
             break;
         }
         return blk;
     }
 
+    private Statement ParseLocalStatement()
+    {
+        Utilities.Todo("implement Parse function arguments");
+
+        return new InvalidStatement();
+    }
+
     private List<VariableDef> ParseFunctionArguments()
     {
         var c = CurrentTkn();
-        List<VariableDef> list = new List<VariableDef>();
+        List<VariableDef> list = new();
         while (true)
         {
             if (c.type == TknType.CloseParen) break;
