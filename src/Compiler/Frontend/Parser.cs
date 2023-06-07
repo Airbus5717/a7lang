@@ -1,7 +1,6 @@
 namespace A7.Frontend;
 
 using A7.Utils;
-using Xunit;
 
 enum BinaryOP : byte
 {

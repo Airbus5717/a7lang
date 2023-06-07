@@ -64,6 +64,15 @@ public class TestLexer
         Assert.Equal(TknType.StringLiteral, tkns[1].type);
     }
 
+    [Fact]
+    public void TestIdentifiers() {
+        Token[] tkns = LexAString("main dlks sadfklas_ds12 @builtin");
+        // didnt convert to loop due to EOT type tokens
+        Assert.Equal(TknType.Identifier, tkns[0].type);
+        Assert.Equal(TknType.Identifier, tkns[1].type);
+        Assert.Equal(TknType.Identifier, tkns[2].type);
+        Assert.Equal(TknType.BuiltinId, tkns[3].type);
+    }
 
     // NOTE(5717): Helper method
     private Token[] LexAString(string input, [CallerMemberName] string member = "")
