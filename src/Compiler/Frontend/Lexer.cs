@@ -26,6 +26,7 @@ public class Lexer
     // save state variables
     // for restoring state in error flow
     private int save_index, save_line;
+    private TknType previous_type;
 
     private static readonly Dictionary<string, TknType> keyword_map = new Dictionary<string, TknType>{
             { "if", TknType.IfKeyword}, { "fn", TknType.FnKeyword},
@@ -59,6 +60,7 @@ public class Lexer
         this.m_line = 1;
         this.m_index = 0;
         this.m_error = LexerErr.UNKNOWN;
+        this.previous_type = TknType.EOT;
     }
 
     // NOTE(5717): Lexer starting point
@@ -538,7 +540,7 @@ public class Lexer
     {
         // NOTE: No need to add duplicate terminators
         // if the previous token is already a terminator
-        if (m_tokens.LongCount() > 0 && m_tokens.Last().type != TknType.Terminator)
+        if (previous_type != TknType.Terminator)
             AddToken(TknType.Terminator);
         else
             Advance();
@@ -587,6 +589,7 @@ public class Lexer
     {
         m_tokens.Add(new Token(m_index, m_length, m_line, type));
         m_index += (m_length); // ADD one to go to the next
+        previous_type = type;
         return Status.Success;
     }
 

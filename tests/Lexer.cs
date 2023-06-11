@@ -65,13 +65,39 @@ public class TestLexer
     }
 
     [Fact]
-    public void TestIdentifiers() {
-        Token[] tkns = LexAString("main dlks sadfklas_ds12 @builtin");
+    public void TestIdentifiers()
+    {
+        Token[] tkns = LexAString("main _ dlks sadfklas_ds12 @builtin");
         // didnt convert to loop due to EOT type tokens
         Assert.Equal(TknType.Identifier, tkns[0].type);
         Assert.Equal(TknType.Identifier, tkns[1].type);
         Assert.Equal(TknType.Identifier, tkns[2].type);
-        Assert.Equal(TknType.BuiltinId, tkns[3].type);
+        Assert.Equal(TknType.Identifier, tkns[3].type);
+        Assert.Equal(TknType.BuiltinId, tkns[4].type);
+    }
+
+    [Fact]
+    public void TestSomeSymbols()
+    {
+        Token[] tkns = LexAString("; >> , << / + ^ & | * ( ) { } [ ] - _");
+        Assert.Equal(TknType.Terminator, tkns[0].type);
+        Assert.Equal(TknType.RightShift, tkns[1].type);
+        Assert.Equal(TknType.Comma, tkns[2].type);
+        Assert.Equal(TknType.LeftShift, tkns[3].type);
+        Assert.Equal(TknType.DivOperator, tkns[4].type);
+        Assert.Equal(TknType.PlusOperator, tkns[5].type);
+        Assert.Equal(TknType.BitwiseXor, tkns[6].type);
+        Assert.Equal(TknType.BitwiseAnd, tkns[7].type);
+        Assert.Equal(TknType.BitwiseOr, tkns[8].type);
+        Assert.Equal(TknType.MultOperator, tkns[9].type);
+        Assert.Equal(TknType.OpenParen, tkns[10].type);
+        Assert.Equal(TknType.CloseParen, tkns[11].type);
+        Assert.Equal(TknType.OpenCurly, tkns[12].type);
+        Assert.Equal(TknType.CloseCurly, tkns[13].type);
+        Assert.Equal(TknType.OpenSQRBrackets, tkns[14].type);
+        Assert.Equal(TknType.CloseSQRBrackets, tkns[15].type);
+        Assert.Equal(TknType.MinusOperator, tkns[16].type);
+        Assert.Equal(TknType.Identifier, tkns[17].type);
     }
 
     // NOTE(5717): Helper method

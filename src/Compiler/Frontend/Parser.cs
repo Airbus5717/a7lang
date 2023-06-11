@@ -18,6 +18,8 @@ enum BinaryOP : byte
 
     Logical_Or,
     Logical_And,
+
+    Record_Child_Access, // i.e. obj.child
     // TODO: Add the rest of operations
 }
 
@@ -25,18 +27,20 @@ enum UnaryOP : byte
 {
     Plus_Operator,
     Negate_Logical,
-    Negate_Sign,
+    Negate_Sign, // NOTE: also known as Minus_Operator
     // TODO: Add the rest of operations
 }
+
+/*
+ *
+ * Expressions
+ *
+*/
 
 public interface ValNode
 {
     // TODO:
-    //
-    string ToString()
-    {
-        return "ValNode";
-    }
+    string ToString();
 }
 
 public struct SingleValueNode : ValNode
@@ -57,41 +61,39 @@ public struct UnaryValueNode : ValNode
     UnaryOP op { get; set; }
 }
 
-
-public interface Statement
+// Arr Sub i.e. Arr[index]
+public struct ArraySubscription : ValNode
 {
-
-}
-
-public struct InvalidStatement : Statement
-{
-
+    ValNode index { get; set; }
+    ValNode array { get; set; }
 }
 
 
-public struct IfTrue : Statement
+/*
+ *
+ * Statements
+ *
+*/
+
+public interface Statement { }
+public struct InvalidStmt : Statement { }
+public struct FnCallStmt : Statement { }
+public struct VarDeclStmt : Statement { }
+public struct MutVarStmt : Statement { }
+public struct MatchStmt : Statement { }
+public struct ForLoopStmt : Statement { }
+
+
+public struct IfStmt : Statement
 {
     ValNode branch_condition { get; set; }
     CodeBlock true_branch { get; set; }
-}
-
-public struct DeclVariable : Statement
-{
-    bool is_const { get; set; }
-    Token id { get; set; }
-    TypeIndex type { get; set; }
-    ValNode value { get; set; }
 }
 
 public struct MutateVariable : Statement
 {
     ValNode new_val { get; set; }
     Token id { get; set; }
-}
-
-public struct FunctionCallStmt : Statement
-{
-
 }
 
 public struct CodeBlock
@@ -480,7 +482,7 @@ public class Parser
     {
         Utilities.Todo("implement Parse function arguments");
 
-        return new InvalidStatement();
+        return new InvalidStmt();
     }
 
     private List<VariableDef> ParseFunctionArguments()
@@ -521,18 +523,16 @@ public class Parser
 
     private Status ExpectAndConsume(TknType type, ParserErr err = ParserErr.UNKNOWN)
     {
-        // NOTE: if next token's type matched the token type then Advance(), else report failure
+        // NOTE: if next token's type matched the token type then Advance(), 
+        // else report failure
         Token c = CurrentTkn();
-        bool eql = c.type == type;
-        if (eql) { Advance(); }
-        else
-        {
-            m_error = err;
+        if (c.type == type) { Advance(); return Status.Success; }
+
+        m_error = err;
 #if DEBUG
-            Utilities.LogDebug(c.ToString());
+        Utilities.LogDebug(c.ToString());
 #endif
-        }
-        return eql ? Status.Success : Status.Failure;
+        return Status.Failure;
     }
 
     private void SkipTerminators()
@@ -548,6 +548,11 @@ public class Parser
     private Token PrevTkn() { return m_tokens[(m_index - 1)]; }
     private void Advance() { ++m_index; }
 
+    private Token CurrentTknAfterAdvancingTerminator()
+    {
+        bool c = m_tokens[m_index].type == TknType.Terminator;
+        return c ? m_tokens[(m_index + 1)] : m_tokens[m_index];
+    }
 
     // other "useless" methods
     public Token GetCurrentToken() { return CurrentTkn(); }
