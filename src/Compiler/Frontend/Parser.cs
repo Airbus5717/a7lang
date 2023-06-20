@@ -2,6 +2,7 @@ namespace A7.Frontend;
 
 using A7.Utils;
 
+// TODO: make lexing and parsing one stage
 enum BinaryOP : byte
 {
     Add,
@@ -467,11 +468,13 @@ public class Parser
     private CodeBlock ParseCodeBlock()
     {
         var blk = new CodeBlock();
-        Utilities.Todo("Parse Code Blocks");
         while (true)
         {
             Statement stmt = ParseLocalStatement();
-            Utilities.Todo("check statements");
+            if (stmt is InvalidStmt)
+            {
+                Utilities.Todo("Handle invalid statments");
+            }
             blk.statements.Add(stmt);
             break;
         }
@@ -480,7 +483,7 @@ public class Parser
 
     private Statement ParseLocalStatement()
     {
-        Utilities.Todo("implement Parse function arguments");
+        Utilities.Todo("implement Parse local statements");
 
         return new InvalidStmt();
     }
@@ -523,7 +526,7 @@ public class Parser
 
     private Status ExpectAndConsume(TknType type, ParserErr err = ParserErr.UNKNOWN)
     {
-        // NOTE: if next token's type matched the token type then Advance(), 
+        // NOTE: if next token's type matched the token type then Advance(),
         // else report failure
         Token c = CurrentTkn();
         if (c.type == type) { Advance(); return Status.Success; }
@@ -548,8 +551,9 @@ public class Parser
     private Token PrevTkn() { return m_tokens[(m_index - 1)]; }
     private void Advance() { ++m_index; }
 
-    private Token CurrentTknAfterAdvancingTerminator()
+    private Token NextToken()
     {
+        // skips terminator then returns the current token
         bool c = m_tokens[m_index].type == TknType.Terminator;
         return c ? m_tokens[(m_index + 1)] : m_tokens[m_index];
     }
