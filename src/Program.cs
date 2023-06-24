@@ -9,7 +9,7 @@ class Program
         Utils.Err.PrintStage(i.item2);
         if (i.item1 == Utils.Status.Failure)
         {
-            Utils.Utilities.LogErr("Failed");
+            Utils.Utilities.LogErr("FAILED");
             Environment.Exit(1);
         }
         else
